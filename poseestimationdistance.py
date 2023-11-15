@@ -100,6 +100,17 @@ def calculate_pose_error(Matches_pose, GT_pose):
     # Convert to degrees
     rotation_error_deg = np.degrees(angle_diff)
 
+    # ----ALTERNATIVE----
+    R = axisangle_Matches - axisangle_GT
+    rotation_error_deg_alt2 = np.arccos((np.trace(R)-1)/2)
+    print("----")
+    print("the two alternatives for rotation error")
+    print(rotation_error_deg)
+    print(rotation_error_deg_alt2)
+    print("----")
+    
+
+
 
     #Translational error
     normalized_t_ab_Matches = t_ab_Matches / np.linalg.norm(t_ab_Matches)
@@ -128,43 +139,43 @@ def calculate_pose_error(Matches_pose, GT_pose):
 
 def get_paths():
     matches_paths_LightGlue = np.array([
-    ["/home/agnes/Dev/tests/test1_matches/test1_lightglue_image1.txt", "/home/agnes/Dev/tests/test1_matches/test1_lightglue_image2.txt"],
-    ["/home/agnes/Dev/tests/test2_matches/test2_lightglue_image1.txt", "/home/agnes/Dev/tests/test2_matches/test2_lightglue_image2.txt"],
-    ["/home/agnes/Dev/tests/test3_matches/test3_lightglue_image1.txt", "/home/agnes/Dev/tests/test3_matches/test3_lightglue_image2.txt"],
-    ["/home/agnes/Dev/tests/test4_matches/test4_lightglue_image1.txt", "/home/agnes/Dev/tests/test4_matches/test4_lightglue_image2.txt"],
-    ["/home/agnes/Dev/tests/test5_matches/test5_lightglue_image1.txt", "/home/agnes/Dev/tests/test5_matches/test5_lightglue_image2.txt"],
-    ["/home/agnes/Dev/tests/test6_matches/test6_lightglue_image1.txt", "/home/agnes/Dev/tests/test6_matches/test6_lightglue_image2.txt"],
+    ["output/test1_matches/test1_lightglue_image1.txt", "output/test1_matches/test1_lightglue_image2.txt"],
+    ["output/test2_matches/test2_lightglue_image1.txt", "output/test2_matches/test2_lightglue_image2.txt"],
+    ["output/test3_matches/test3_lightglue_image1.txt", "output/test3_matches/test3_lightglue_image2.txt"],
+    ["output/test4_matches/test4_lightglue_image1.txt", "output/test4_matches/test4_lightglue_image2.txt"],
+    ["output/test5_matches/test5_lightglue_image1.txt", "output/test5_matches/test5_lightglue_image2.txt"],
+    ["output/test6_matches/test6_lightglue_image1.txt", "output/test6_matches/test6_lightglue_image2.txt"],
     #distance tests
-    ["/home/agnes/Dev/tests/distance_matches_results-20231109T123206Z-001/distance_matches_results/test8_matches/test8_lightglue_image1.txt","/home/agnes/Dev/tests/distance_matches_results-20231109T123206Z-001/distance_matches_results/test8_matches/test8_lightglue_image2.txt"],
-    ["/home/agnes/Dev/tests/distance_matches_results-20231109T123206Z-001/distance_matches_results/test9_matches/test9_lightglue_image1.txt","/home/agnes/Dev/tests/distance_matches_results-20231109T123206Z-001/distance_matches_results/test9_matches/test9_lightglue_image2.txt"],
-    ["/home/agnes/Dev/tests/distance_matches_results-20231109T123206Z-001/distance_matches_results/test10_matches/test10_lightglue_image1.txt","/home/agnes/Dev/tests/distance_matches_results-20231109T123206Z-001/distance_matches_results/test10_matches/test10_lightglue_image2.txt"],
-    ["/home/agnes/Dev/tests/distance_matches_results-20231109T123206Z-001/distance_matches_results/test11_matches/test11_lightglue_image1.txt","/home/agnes/Dev/tests/distance_matches_results-20231109T123206Z-001/distance_matches_results/test11_matches/test11_lightglue_image2.txt"],
-    ["/home/agnes/Dev/tests/distance_matches_results-20231109T123206Z-001/distance_matches_results/test12_matches/test12_lightglue_image1.txt","/home/agnes/Dev/tests/distance_matches_results-20231109T123206Z-001/distance_matches_results/test12_matches/test12_lightglue_image2.txt"],
-    ["/home/agnes/Dev/tests/distance_matches_results-20231109T123206Z-001/distance_matches_results/test13_matches/test13_lightglue_image1.txt","/home/agnes/Dev/tests/distance_matches_results-20231109T123206Z-001/distance_matches_results/test13_matches/test13_lightglue_image2.txt"]
+    ["output/test7_matches/test7_lightglue_image1.txt","output/test7_matches/test7_lightglue_image2.txt"],
+    ["output/test8_matches/test8_lightglue_image1.txt","output/test8_matches/test8_lightglue_image2.txt"],
+    ["output/test9_matches/test9_lightglue_image1.txt","output/test9_matches/test9_lightglue_image2.txt"],
+    ["output/test10_matches/test10_lightglue_image1.txt","output/test10_matches/test10_lightglue_image2.txt"],
+    ["output/test11_matches/test11_lightglue_image1.txt","output/test11_matches/test11_lightglue_image2.txt"],
+    ["output/test12_matches/test12_lightglue_image1.txt","output/test12_matches/test12_lightglue_image2.txt"]
 ])
     matches_paths_ORB = np.array([
-    ["/home/agnes/Dev/tests/test1_matches/test1_orb_image1.txt", "/home/agnes/Dev/tests/test1_matches/test1_orb_image2.txt"],
-    ["/home/agnes/Dev/tests/test2_matches/test2_orb_image1.txt", "/home/agnes/Dev/tests/test2_matches/test2_orb_image2.txt"],
-    ["/home/agnes/Dev/tests/test3_matches/test3_orb_image1.txt", "/home/agnes/Dev/tests/test3_matches/test3_orb_image2.txt"],#THIS ONE FAILS AND IT IS SUPPOSED TO
-    ["/home/agnes/Dev/tests/test4_matches/test4_orb_image1.txt", "/home/agnes/Dev/tests/test4_matches/test4_orb_image2.txt"],
-    ["/home/agnes/Dev/tests/test5_matches/test5_orb_image1.txt", "/home/agnes/Dev/tests/test5_matches/test5_orb_image2.txt"],
-    ["/home/agnes/Dev/tests/test6_matches/test6_orb_image1.txt", "/home/agnes/Dev/tests/test6_matches/test6_orb_image2.txt"],
+    ["output/test1_matches/test1_orb_image1.txt", "output/test1_matches/test1_orb_image2.txt"],
+    ["output/test2_matches/test2_orb_image1.txt", "output/test2_matches/test2_orb_image2.txt"],
+    ["output/test3_matches/test3_orb_image1.txt", "output/test3_matches/test3_orb_image2.txt"],#THIS ONE FAILS AND IT IS SUPPOSED TO
+    ["output/test4_matches/test4_orb_image1.txt", "output/test4_matches/test4_orb_image2.txt"],
+    ["output/test5_matches/test5_orb_image1.txt", "output/test5_matches/test5_orb_image2.txt"],
+    ["output/test6_matches/test6_orb_image1.txt", "output/test6_matches/test6_orb_image2.txt"],
     #distance tests
-    ["/home/agnes/Dev/tests/distance_matches_results-20231109T123206Z-001/distance_matches_results/test8_matches/test8_orb_image1.txt","/home/agnes/Dev/tests/distance_matches_results-20231109T123206Z-001/distance_matches_results/test8_matches/test8_orb_image2.txt"],
-    ["/home/agnes/Dev/tests/distance_matches_results-20231109T123206Z-001/distance_matches_results/test9_matches/test9_orb_image1.txt","/home/agnes/Dev/tests/distance_matches_results-20231109T123206Z-001/distance_matches_results/test9_matches/test9_orb_image2.txt"],
-    ["/home/agnes/Dev/tests/distance_matches_results-20231109T123206Z-001/distance_matches_results/test10_matches/test10_orb_image1.txt","/home/agnes/Dev/tests/distance_matches_results-20231109T123206Z-001/distance_matches_results/test10_matches/test10_orb_image2.txt"],
-    ["/home/agnes/Dev/tests/distance_matches_results-20231109T123206Z-001/distance_matches_results/test11_matches/test11_orb_image1.txt","/home/agnes/Dev/tests/distance_matches_results-20231109T123206Z-001/distance_matches_results/test11_matches/test11_orb_image2.txt"],
-    ["/home/agnes/Dev/tests/distance_matches_results-20231109T123206Z-001/distance_matches_results/test12_matches/test12_orb_image1.txt","/home/agnes/Dev/tests/distance_matches_results-20231109T123206Z-001/distance_matches_results/test12_matches/test12_orb_image2.txt"],
-    ["/home/agnes/Dev/tests/distance_matches_results-20231109T123206Z-001/distance_matches_results/test13_matches/test13_orb_image1.txt","/home/agnes/Dev/tests/distance_matches_results-20231109T123206Z-001/distance_matches_results/test13_matches/test13_orb_image2.txt"]
+    ["output/test7_matches/test7_orb_image1.txt","output/test7_matches/test7_orb_image2.txt"],
+    ["output/test8_matches/test8_orb_image1.txt","output/test8_matches/test8_orb_image2.txt"],
+    ["output/test9_matches/test9_orb_image1.txt","output/test9_matches/test9_orb_image2.txt"],
+    ["output/test10_matches/test10_orb_image1.txt","output/test10_matches/test10_orb_image2.txt"],
+    ["output/test11_matches/test11_orb_image1.txt","output/test11_matches/test11_orb_image2.txt"],
+    ["output/test12_matches/test12_orb_image1.txt","output/test12_matches/test12_orb_image2.txt"]
 ])
 
     return matches_paths_LightGlue, matches_paths_ORB
 
 
 
-if __name__ == "__main__":
+def pose_estimation(timestamps):
     #Calculating ground truth relative pose
-    GT_path = "/home/agnes/Dev/Datasets/VAROS/camM0_poses_transformation_matrix.csv"  # Replace with the actual file path
+    GT_path = "Datasets/VAROS/camM0_poses_transformation_matrix.csv"  # Replace with the actual file path
     
     #K matrix
     fx = 990.323
