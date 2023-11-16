@@ -101,13 +101,15 @@ def calculate_pose_error(Matches_pose, GT_pose):
     rotation_error_deg = np.degrees(angle_diff)
 
     # ----ALTERNATIVE----
-    R = axisangle_Matches - axisangle_GT
-    rotation_error_deg_alt2 = np.arccos((np.trace(R)-1)/2)
-    print("----")
-    print("the two alternatives for rotation error")
-    print(rotation_error_deg)
-    print(rotation_error_deg_alt2)
-    print("----")
+    R = R_ab_Matches - R_ab_GT
+    R_angle_diff= np.arccos((np.trace(R)-1)/2)
+    # Convert to degrees
+    rotation_error_deg_alt2= np.degrees(R_angle_diff)
+    #print("----")
+    #print("the two alternatives for rotation error")
+    #print(rotation_error_deg)
+    #print(rotation_error_deg_alt2)
+    #print("----")
     
 
 
