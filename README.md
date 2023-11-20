@@ -15,19 +15,27 @@ Before setting up this project, you need to clone and install the LightGlue fram
    
 ```bash
 git clone https://github.com/cvg/LightGlue.git && cd LightGlue
+```
 
 
 2. Install LightGlue:
-
+   
+```bash
 python -m pip install -e .
+```
 
 3. Clone My Repository:
 
+
 Return to the parent directory (assuming you are in the LightGlue directory):
 
+```bash
 cd ..
+```
 
 Clone this repository:
 
-git clone https://github.com/agnesvb/UW-SLAM-preproject.git && cd UW-SLAM-preproject
 
+```bash
+git clone https://github.com/agnesvb/UW-SLAM-preproject.git && cd UW-SLAM-preproject
+```
