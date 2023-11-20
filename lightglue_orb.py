@@ -41,31 +41,31 @@ orb = cv2.ORB_create()
 
 def set_image_paths(sequence):
     paths = {
-        1: ["/home/anna/LightGlue/orb_fail_data/firstfail/0165804999936.png",
-            "/home/anna/LightGlue/orb_fail_data/firstfail/0165904999936.png"],
-        2: ["/home/anna/LightGlue/orb_fail_data/firstfail/0165904999936.png",
-            "/home/anna/LightGlue/orb_fail_data/firstfail/0166004999936.png"],
-        3: ["/home/anna/LightGlue/orb_fail_data/secondfail/0300104999936.png",
-            "/home/anna/LightGlue/orb_fail_data/secondfail/0300204999936.png"],
-        4: ["/home/anna/LightGlue/orb_fail_data/secondfail/0300204999936.png",
-            "/home/anna/LightGlue/orb_fail_data/secondfail/0300304999936.png"],
-        5: ["/home/anna/LightGlue/orb_fail_data/thirdfail/0446004999936.png",
-            "/home/anna/LightGlue/orb_fail_data/thirdfail/0446104999936.png"],
-        6: ["/home/anna/LightGlue/orb_fail_data/thirdfail/0446104999936.png",
-            "/home/anna/LightGlue/orb_fail_data/thirdfail/0446204999936.png"],
+        1: ["Datasets/VAROS/cam0/data/0165804999936.png",
+            "Datasets/VAROS/cam0/data/0165904999936.png"],
+        2: ["Datasets/VAROS/cam0/data/0165904999936.png",
+            "Datasets/VAROS/cam0/data/0166004999936.png"],
+        3: ["Datasets/VAROS/cam0/data/0300104999936.png",
+            "Datasets/VAROS/cam0/data/0300204999936.png"],
+        4: ["Datasets/VAROS/cam0/data/0300204999936.png",
+            "Datasets/VAROS/cam0/data/0300304999936.png"],
+        5: ["Datasets/VAROS/cam0/data/0446004999936.png",
+            "Datasets/VAROS/cam0/data/0446104999936.png"],
+        6: ["Datasets/VAROS/cam0/data/0446104999936.png",
+            "Datasets/VAROS/cam0/data/0446204999936.png"],
         # Distance Between Frames #
-        7: ["/home/anna/LightGlue/orb_fail_data_distance/firstfail/0165804999936.png",
-            "/home/anna/LightGlue/orb_fail_data_distance/firstfail/0166404999936.png"],
-        8: ["/home/anna/LightGlue/orb_fail_data_distance/firstfail/0165804999936.png",
-            "/home/anna/LightGlue/orb_fail_data_distance/firstfail/0167004999936.png"],
-        9: ["/home/anna/LightGlue/orb_fail_data_distance/secondfail/0300104999936.png",
-            "/home/anna/LightGlue/orb_fail_data_distance/secondfail/0300704999936.png"],
-        10: ["/home/anna/LightGlue/orb_fail_data_distance/secondfail/0300104999936.png",
-            "/home/anna/LightGlue/orb_fail_data_distance/secondfail/0301304999936.png"],
-        11: ["/home/anna/LightGlue/orb_fail_data_distance/thirdfail/0446004999936.png",
-            "/home/anna/LightGlue/orb_fail_data_distance/thirdfail/0446604999936.png"],
-        12: ["/home/anna/LightGlue/orb_fail_data_distance/thirdfail/0446004999936.png",
-            "/home/anna/LightGlue/orb_fail_data_distance/thirdfail/0447204999936.png"]
+        7: ["Datasets/VAROS/cam0/data/0165804999936.png",
+            "Datasets/VAROS/cam0/data/0166404999936.png"],
+        8: ["Datasets/VAROS/cam0/data/0165804999936.png",
+            "Datasets/VAROS/cam0/data/0167004999936.png"],
+        9: ["Datasets/VAROS/cam0/data/0300104999936.png",
+            "Datasets/VAROS/cam0/data/0300704999936.png"],
+        10: ["Datasets/VAROS/cam0/data/0300104999936.png",
+            "Datasets/VAROS/cam0/data/0301304999936.png"],
+        11: ["Datasets/VAROS/cam0/data/0446004999936.png",
+            "Datasets/VAROS/cam0/data/0446604999936.png"],
+        12: ["Datasets/VAROS/cam0/data/0446004999936.png",
+            "Datasets/VAROS/cam0/data/0447204999936.png"]
     
     }
     
@@ -114,7 +114,7 @@ def orb_bf(orb_image0, orb_image1):
     orb_matches = np.array([[m.queryIdx, m.trainIdx] for m in orb_matches])
 
     orb_m_kpts0 = orb_kpts0[orb_matches[:, 0]]
-    orb_m_kpts1 = orb_kpts0[orb_matches[:, 1]]
+    orb_m_kpts1 = orb_kpts1[orb_matches[:, 1]]
 
     # Annotations for number of features
     orb_num_feats_image0 = len(orb_kpts0)
@@ -152,7 +152,7 @@ def save_keypoints_to_file(sequence, keypoints, image_number, method='lightglue'
 
 
 
-def plot_lightglue(image0, image1, kpts0, kpts1, m_kpts0, m_kpts1, matches01):
+def plot_lightglue(image0, image1, kpts0, kpts1, m_kpts0, m_kpts1, matches01, sequence_number):
     
      ## LIGHTGLUE MATCHES ##
     axes = viz2d.plot_images([image0, image1])
@@ -173,7 +173,7 @@ def plot_lightglue(image0, image1, kpts0, kpts1, m_kpts0, m_kpts1, matches01):
     plt.savefig(f'/output/test{sequence_number}_lg_features.pdf', format='pdf')
 
 
-def plot_orb_bf(image0, image1, orb_matches, orb_kpts0, orb_kpts1):
+def plot_orb_bf(image0, image1, orb_matches, orb_kpts0, orb_kpts1, sequence_number):
     ## ORB BF MATCHES ##
     axes = viz2d.plot_images([image0, image1])
     viz2d.plot_matches(orb_kpts0[orb_matches[:, 0]], orb_kpts1[orb_matches[:, 1]], color="magenta", lw=0.2)

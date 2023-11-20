@@ -1,14 +1,17 @@
 from poseestimationdistance import *
 from lightglue_orb import *
 from findoutliers import *
+from runonentireVAROS import *
 
 
-#Run LightGlue on entire VAROS
-    #In these functions there should be a call for a function that evaluates performance
-
-#Run ORB + BruteForce on entire VAROS
-    #In these functions there should be a call for a function that evaluates performance
-
+#Run LightGlue and ORb+BF on entire VAROS
+mean_rot_error_LG, mean_trans_error_LG, fails_LG, mean_rot_error_ORB, mean_trans_error_ORB, fails_ORB = runonentireVAROS()
+print(mean_rot_error_LG)
+print(mean_trans_error_LG)
+print(fails_LG)
+print(mean_rot_error_ORB)
+print(mean_trans_error_ORB)
+print(fails_ORB)
 
 timestamps = np.array([
     [165804999936, 165904999936],
@@ -25,7 +28,7 @@ timestamps = np.array([
     [446004999936, 446604999936],
     [446004999936, 447204999936]
 ])
-
+"""
 for sequence_number in range(1, 13): 
     image0_path, image1_path = set_image_paths(sequence_number)
     
@@ -48,17 +51,17 @@ for sequence_number in range(1, 13):
     save_keypoints_to_file(sequence_number, orb_m_kpts0, 2, method='orb', output_dir='output')
     
     #Plot results
-    plot_lightglue(image0, image1, kpts0, kpts1, m_kpts0, m_kpts1, matches01)
-    plot_orb_bf(image0, image1, orb_matches, orb_kpts0, orb_kpts1)
-    save_optical_flow_visualization(image0_path, image1_path, m_kpts0, m_kpts1, sequence_number, method='lightglue')
-    save_optical_flow_visualization(image0_path, image1_path, orb_m_kpts0, orb_m_kpts1, sequence_number, method='orb')
-    
+    #plot_lightglue(image0, image1, kpts0, kpts1, m_kpts0, m_kpts1, matches01, sequence_number)
+    #plot_orb_bf(image0, image1, orb_matches, orb_kpts0, orb_kpts1, sequence_number)
+    #save_optical_flow_visualization(image0_path, image1_path, m_kpts0, m_kpts1, sequence_number, method='lightglue')
+    #save_optical_flow_visualization(image0_path, image1_path, orb_m_kpts0, orb_m_kpts1, sequence_number, method='orb')
+"""   
 
 #Use files to calculate relative pose difference
 #pose_estimation(timestamps)
 
 #Mark matches as correct or false based on GT rel pose
-findoutliers(timestamps)
+#findoutliers(timestamps)
     #plot this
 
 
