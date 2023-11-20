@@ -26,6 +26,7 @@ import torch
 import cv2
 import numpy as np
 import torch
+import os
 
 torch.set_grad_enabled(False)
 #images = ("/home/anna/LightGlue/data")
@@ -55,20 +56,18 @@ def set_image_paths(sequence):
             "/home/anna/LightGlue/orb_fail_data/thirdfail/0446104999936.png"],
         6: ["/home/anna/LightGlue/orb_fail_data/thirdfail/0446104999936.png",
             "/home/anna/LightGlue/orb_fail_data/thirdfail/0446204999936.png"],
-        7: ["/home/anna/LightGlue/data/0135004999936.png",
-            "/home/anna/LightGlue/data/0135804999936.png"],
         # Distance Between Frames #
-        8: ["/home/anna/LightGlue/orb_fail_data_distance/firstfail/0165804999936.png",
+        7: ["/home/anna/LightGlue/orb_fail_data_distance/firstfail/0165804999936.png",
             "/home/anna/LightGlue/orb_fail_data_distance/firstfail/0166404999936.png"],
-        9: ["/home/anna/LightGlue/orb_fail_data_distance/firstfail/0165804999936.png",
+        8: ["/home/anna/LightGlue/orb_fail_data_distance/firstfail/0165804999936.png",
             "/home/anna/LightGlue/orb_fail_data_distance/firstfail/0167004999936.png"],
-        10: ["/home/anna/LightGlue/orb_fail_data_distance/secondfail/0300104999936.png",
+        9: ["/home/anna/LightGlue/orb_fail_data_distance/secondfail/0300104999936.png",
             "/home/anna/LightGlue/orb_fail_data_distance/secondfail/0300704999936.png"],
-        11: ["/home/anna/LightGlue/orb_fail_data_distance/secondfail/0300104999936.png",
+        10: ["/home/anna/LightGlue/orb_fail_data_distance/secondfail/0300104999936.png",
             "/home/anna/LightGlue/orb_fail_data_distance/secondfail/0301304999936.png"],
-        12: ["/home/anna/LightGlue/orb_fail_data_distance/thirdfail/0446004999936.png",
+        11: ["/home/anna/LightGlue/orb_fail_data_distance/thirdfail/0446004999936.png",
             "/home/anna/LightGlue/orb_fail_data_distance/thirdfail/0446604999936.png"],
-        13: ["/home/anna/LightGlue/orb_fail_data_distance/thirdfail/0446004999936.png",
+        12: ["/home/anna/LightGlue/orb_fail_data_distance/thirdfail/0446004999936.png",
             "/home/anna/LightGlue/orb_fail_data_distance/thirdfail/0447204999936.png"]
     
     }
@@ -76,8 +75,6 @@ def set_image_paths(sequence):
     if sequence not in paths:
         raise ValueError("Unknown sequence number.")
     return paths[sequence]
-
-sequence_number = 7  # Change this number for different sequences
 
 
 def lightglue(image0, image1):
@@ -134,12 +131,16 @@ def orb_bf(orb_image0, orb_image1):
     return orb_matches, orb_kpts0, orb_kpts1, orb_m_kpts0, orb_m_kpts1
 
 
-def save_keypoints_to_file(sequence, keypoints, image_number, method='lightglue'):
+def save_keypoints_to_file(sequence, keypoints, image_number, method='lightglue', output_dir='output'):
 
+    # Ensure the output directory exists
+    os.makedirs(output_dir, exist_ok=True)
+
+    # Define the file name with the output directory
     if method == 'lightglue':
-        file_name = f'test{sequence}_lightglue_image{image_number}.txt'
+        file_name = os.path.join(output_dir, f'test{sequence}_lightglue_image{image_number}.txt')
     else:  # Default to 'orb' if not 'lightglue'
-        file_name = f'test{sequence}_orb_image{image_number}.txt'
+        file_name = os.path.join(output_dir, f'test{sequence}_orb_image{image_number}.txt')
 
     with open(file_name, 'w') as file:
         if isinstance(keypoints, list):  # Assuming tensor data is presented as a list of tensors
@@ -153,6 +154,7 @@ def save_keypoints_to_file(sequence, keypoints, image_number, method='lightglue'
     print(f"Saved {method.upper()} matches for image {image_number} in sequence {sequence} to {file_name}")
 
 
+
 def plot_lightglue(image0, image1, kpts0, kpts1, m_kpts0, m_kpts1, matches01):
     
      ## LIGHTGLUE MATCHES ##
@@ -161,8 +163,8 @@ def plot_lightglue(image0, image1, kpts0, kpts1, m_kpts0, m_kpts1, matches01):
     viz2d.add_text(0, f'Stop after {matches01["stop"]} layers', fs=20)
 
     # Save LIGHTGLUE matches figure
-    plt.savefig(f'test{sequence_number}_lg_matches.eps', format='eps')
-    plt.savefig(f'test{sequence_number}_lg_matches.pdf', format='pdf')
+    plt.savefig(f'/output/test{sequence_number}_lg_matches.eps', format='eps')
+    plt.savefig(f'/output/test{sequence_number}_lg_matches.pdf', format='pdf')
 
     ## LIGHTGLUE KEYPOINTS ##
     kpc0, kpc1 = viz2d.cm_prune(matches01["prune0"]), viz2d.cm_prune(matches01["prune1"])
@@ -170,8 +172,8 @@ def plot_lightglue(image0, image1, kpts0, kpts1, m_kpts0, m_kpts1, matches01):
     viz2d.plot_keypoints([kpts0, kpts1], colors=[kpc0, kpc1], ps=10)
 
     # Save LIGHTGLUE keypoints figure
-    plt.savefig(f'test{sequence_number}_lg_features.eps', format='eps')
-    plt.savefig(f'test{sequence_number}_lg_features.pdf', format='pdf')
+    plt.savefig(f'/output/test{sequence_number}_lg_features.eps', format='eps')
+    plt.savefig(f'/output/test{sequence_number}_lg_features.pdf', format='pdf')
 
 
 def plot_orb_bf(image0, image1, orb_matches, orb_kpts0, orb_kpts1):
@@ -180,15 +182,15 @@ def plot_orb_bf(image0, image1, orb_matches, orb_kpts0, orb_kpts1):
     viz2d.plot_matches(orb_kpts0[orb_matches[:, 0]], orb_kpts1[orb_matches[:, 1]], color="magenta", lw=0.2)
 
     # Save ORB BF matches figure
-    plt.savefig(f'test{sequence_number}_orb_matches.eps', format='eps')
-    plt.savefig(f'test{sequence_number}_orb_matches.pdf', format='pdf')
+    plt.savefig(f'/output/test{sequence_number}_orb_matches.eps', format='eps')
+    plt.savefig(f'/output/test{sequence_number}_orb_matches.pdf', format='pdf')
 
     ## ORB FEATURES ##
     viz2d.plot_images([image0, image1])
     viz2d.plot_keypoints([orb_kpts0, orb_kpts1], colors=['red', 'red'], ps=10)
 
-    plt.savefig(f'test{sequence_number}_orb_features.eps', format='eps')
-    plt.savefig(f'test{sequence_number}_orb_features.pdf', format='pdf')
+    plt.savefig(f'/output/test{sequence_number}_orb_features.eps', format='eps')
+    plt.savefig(f'/output/test{sequence_number}_orb_features.pdf', format='pdf')
 
     plt.show()
 
@@ -225,35 +227,7 @@ def save_optical_flow_visualization(image0_path, image1_path, keypoints0, keypoi
     plt.tight_layout(pad=0.5)
 
     # Save the figure
-    plt.savefig(f'{method}_optical_flow_test{sequence_number}.eps', format='eps')
-    plt.savefig(f'{method}_optical_flow_test{sequence_number}.pdf', format='pdf')
+    plt.savefig(f'/output/{method}_optical_flow_test{sequence_number}.eps', format='eps')
+    plt.savefig(f'/output/{method}_optical_flow_test{sequence_number}.pdf', format='pdf')
     plt.show()
 
-
-def process_sequence(sequence_number):
-
-    image0_path, image1_path = set_image_paths(sequence_number)
-
-    image0 = load_image(image0_path)
-    image1 = load_image(image1_path)
-
-    orb_image0 = cv2.imread(image0_path, cv2.IMREAD_GRAYSCALE)
-    orb_image1 = cv2.imread(image1_path, cv2.IMREAD_GRAYSCALE)
-
-    matches01, kpts0, kpts1, m_kpts0, m_kpts1 = lightglue(image0, image1)
-    orb_matches, orb_kpts0, orb_kpts1, orb_m_kpts0, orb_m_kpts1 = orb_bf(orb_image0, orb_image1)
-
-    save_keypoints_to_file(sequence_number, m_kpts0, 1, method='lightglue')
-    save_keypoints_to_file(sequence_number, m_kpts1, 2, method='lightglue')
-    save_keypoints_to_file(sequence_number, orb_m_kpts0, 1, method='orb')
-    save_keypoints_to_file(sequence_number, orb_m_kpts0, 2, method='orb')
-
-    plot_lightglue(image0, image1, kpts0, kpts1, m_kpts0, m_kpts1, matches01)
-    plot_orb_bf(image0, image1, orb_matches, orb_kpts0, orb_kpts1)
-
-    save_optical_flow_visualization(image0_path, image1_path, m_kpts0, m_kpts1, sequence_number, method='lightglue')
-    save_optical_flow_visualization(image0_path, image1_path, orb_m_kpts0, orb_m_kpts1, sequence_number, method='orb')
-
-
-#for sequence_number in range(1, 14):  # Adjust the range as needed
-process_sequence(7)
