@@ -114,7 +114,7 @@ def orb_bf(orb_image0, orb_image1):
     orb_matches = np.array([[m.queryIdx, m.trainIdx] for m in orb_matches])
 
     orb_m_kpts0 = orb_kpts0[orb_matches[:, 0]]
-    orb_m_kpts1 = orb_kpts0[orb_matches[:, 1]]
+    orb_m_kpts1 = orb_kpts1[orb_matches[:, 1]]
 
     # Annotations for number of features
     orb_num_feats_image0 = len(orb_kpts0)
@@ -152,7 +152,7 @@ def save_keypoints_to_file(sequence, keypoints, image_number, method='lightglue'
 
 
 
-def plot_lightglue(image0, image1, kpts0, kpts1, m_kpts0, m_kpts1, matches01):
+def plot_lightglue(image0, image1, kpts0, kpts1, m_kpts0, m_kpts1, matches01, sequence_number):
     
      ## LIGHTGLUE MATCHES ##
     axes = viz2d.plot_images([image0, image1])
@@ -173,7 +173,7 @@ def plot_lightglue(image0, image1, kpts0, kpts1, m_kpts0, m_kpts1, matches01):
     plt.savefig(f'/output/test{sequence_number}_lg_features.pdf', format='pdf')
 
 
-def plot_orb_bf(image0, image1, orb_matches, orb_kpts0, orb_kpts1):
+def plot_orb_bf(image0, image1, orb_matches, orb_kpts0, orb_kpts1, sequence_number):
     ## ORB BF MATCHES ##
     axes = viz2d.plot_images([image0, image1])
     viz2d.plot_matches(orb_kpts0[orb_matches[:, 0]], orb_kpts1[orb_matches[:, 1]], color="magenta", lw=0.2)
