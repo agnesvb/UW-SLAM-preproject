@@ -1,4 +1,5 @@
 from poseestimationdistance import *
+from findoutliers import *
 
 
 #Run LightGlue on entire VAROS
@@ -36,9 +37,10 @@ timestamps = np.array([
 
 
 #Use files to calculate relative pose difference
-pose_estimation(timestamps)
+#pose_estimation(timestamps)
 
 #Mark matches as correct or false based on GT rel pose
+findoutliers(timestamps)
     #plot this
 
 

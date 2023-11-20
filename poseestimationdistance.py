@@ -177,7 +177,7 @@ def get_paths():
 
 def pose_estimation(timestamps):
     #Calculating ground truth relative pose
-    GT_path = "Datasets/VAROS/camM0_poses_transformation_matrix.csv"  # Replace with the actual file path
+    GT_path = "Datasets/VAROS/camM0_poses_transformation_matrix.csv"  
     
     #K matrix
     fx = 990.323
