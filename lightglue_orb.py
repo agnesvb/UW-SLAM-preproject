@@ -7,9 +7,6 @@
 # 5. Saving Optical Flow Visualizations: Generates and saves optical flow visualizations for both LIGHTGLUE and ORB methods.
 # 6. Setup and Initialization: Sets up necessary libraries and initializes devices, extractors, and matchers.
 # 7. Image Path Configuration: Function to set and manage image paths for different sequences.
-# 8. Main Processing Function: `process_sequence` function to orchestrate detection, matching, plotting, and saving for a given sequence.
-
-# Usage: Modify the sequence number and run `process_sequence` to process and visualize feature matches and optical flow.
 
 
 ### SETUP ###
