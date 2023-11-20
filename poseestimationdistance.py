@@ -189,22 +189,7 @@ def pose_estimation(timestamps):
                 [0, fy, cy],
                 [0, 0, 1]])
    
-    #nr_of_tests x 2 array of first and last picture of the test 
-    timestamps = np.array([
-    [165804999936, 165904999936],
-    [165904999936, 166004999936],
-    [300104999936, 300204999936],
-    [300204999936, 300304999936],
-    [446004999936, 446104999936],
-    [446104999936, 446204999936],
-    #Now the scenes with distance
-    [165804999936, 166404999936],
-    [165804999936, 167004999936],
-    [300104999936, 300704999936],
-    [300104999936, 301304999936],
-    [446004999936, 446604999936],
-    [446004999936, 447204999936]
-])
+
     
     #array of paths to matches for LightGlue, and ORB-features
     matches_paths_LightGlue, matches_paths_ORB = get_paths()
