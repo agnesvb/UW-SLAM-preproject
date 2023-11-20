@@ -12,7 +12,8 @@ Before setting up this project, you need to clone and install the LightGlue fram
 ## Setup Instructions
 
 1. Clone the LightGlue Repository:
-
+   
+```bash
 git clone https://github.com/cvg/LightGlue.git && cd LightGlue
 
 
