@@ -1,8 +1,6 @@
 # UW-SLAM-preproject
 NTNU preproject for evalutaion of underwater feature matching methods
 
-# My Project
-
 This repository contains my project that utilizes the LightGlue framework for feature detection and matching. 
 Before setting up this project, you need to clone and install the LightGlue framework.
 
