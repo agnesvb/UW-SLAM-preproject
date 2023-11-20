@@ -50,8 +50,8 @@ for sequence_number in range(1, 13):
     #Plot results
     plot_lightglue(image0, image1, kpts0, kpts1, m_kpts0, m_kpts1, matches01)
     plot_orb_bf(image0, image1, orb_matches, orb_kpts0, orb_kpts1)
-    save_optical_flow_visualization(image0_path, image1_path, m_kpts0, m_kpts1, sequence_number, method='lightglue')
-    save_optical_flow_visualization(image0_path, image1_path, orb_m_kpts0, orb_m_kpts1, sequence_number, method='orb')
+    save_optical_flow_visualization(image0_path, image1_path, m_kpts0, m_kpts1, sequence_number, method='lightglue', sequence_number)
+    save_optical_flow_visualization(image0_path, image1_path, orb_m_kpts0, orb_m_kpts1, sequence_number, method='orb', sequence_number)
     
 
 #Use files to calculate relative pose difference
