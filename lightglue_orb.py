@@ -10,7 +10,6 @@
 
 
 ### SETUP ###
-
 # Set the matplotlib backend to TkAgg
 import matplotlib
 matplotlib.use('TkAgg')
@@ -35,38 +34,58 @@ extractor = SuperPoint(max_num_keypoints=2048).eval().to(device)  # load the ext
 matcher = LightGlue(features="superpoint").eval().to(device)
 
 # Initialize ORB detector
-orb = cv2.ORB_create()
+orb = cv2.ORB_create(nfeatures=100) 
 
 ## ORB FAILED SEQUENCE 1 ##
 
 def set_image_paths(sequence):
     paths = {
-        1: ["Datasets/VAROS/cam0/data/0165804999936.png",
-            "Datasets/VAROS/cam0/data/0165904999936.png"],
-        2: ["Datasets/VAROS/cam0/data/0165904999936.png",
-            "Datasets/VAROS/cam0/data/0166004999936.png"],
-        3: ["Datasets/VAROS/cam0/data/0300104999936.png",
-            "Datasets/VAROS/cam0/data/0300204999936.png"],
-        4: ["Datasets/VAROS/cam0/data/0300204999936.png",
-            "Datasets/VAROS/cam0/data/0300304999936.png"],
-        5: ["Datasets/VAROS/cam0/data/0446004999936.png",
-            "Datasets/VAROS/cam0/data/0446104999936.png"],
-        6: ["Datasets/VAROS/cam0/data/0446104999936.png",
-            "Datasets/VAROS/cam0/data/0446204999936.png"],
+        1: ["/home/anna/LightGlue/orb_fail_data/firstfail/0165804999936.png",
+            "/home/anna/LightGlue/orb_fail_data/firstfail/0165904999936.png"],
+        2: ["/home/anna/LightGlue/orb_fail_data/firstfail/0165904999936.png",
+            "/home/anna/LightGlue/orb_fail_data/firstfail/0166004999936.png"],
+        3: ["/home/anna/LightGlue/orb_fail_data/secondfail/0300104999936.png",
+            "/home/anna/LightGlue/orb_fail_data/secondfail/0300204999936.png"],
+        4: ["/home/anna/LightGlue/orb_fail_data/secondfail/0300204999936.png",
+            "/home/anna/LightGlue/orb_fail_data/secondfail/0300304999936.png"],
+        5: ["/home/anna/LightGlue/orb_fail_data/thirdfail/0446004999936.png",
+            "/home/anna/LightGlue/orb_fail_data/thirdfail/0446104999936.png"],
+        6: ["/home/anna/LightGlue/orb_fail_data/thirdfail/0446104999936.png",
+            "/home/anna/LightGlue/orb_fail_data/thirdfail/0446204999936.png"],
         # Distance Between Frames #
-        7: ["Datasets/VAROS/cam0/data/0165804999936.png",
-            "Datasets/VAROS/cam0/data/0166404999936.png"],
-        8: ["Datasets/VAROS/cam0/data/0165804999936.png",
-            "Datasets/VAROS/cam0/data/0167004999936.png"],
-        9: ["Datasets/VAROS/cam0/data/0300104999936.png",
-            "Datasets/VAROS/cam0/data/0300704999936.png"],
-        10: ["Datasets/VAROS/cam0/data/0300104999936.png",
-            "Datasets/VAROS/cam0/data/0301304999936.png"],
-        11: ["Datasets/VAROS/cam0/data/0446004999936.png",
-            "Datasets/VAROS/cam0/data/0446604999936.png"],
-        12: ["Datasets/VAROS/cam0/data/0446004999936.png",
-            "Datasets/VAROS/cam0/data/0447204999936.png"]
-    
+        7: ["/home/anna/LightGlue/orb_fail_data_distance/firstfail/0165804999936.png",
+            "/home/anna/LightGlue/orb_fail_data_distance/firstfail/0166404999936.png"],
+        8: ["/home/anna/LightGlue/orb_fail_data_distance/firstfail/0165804999936.png",
+            "/home/anna/LightGlue/orb_fail_data_distance/firstfail/0167004999936.png"],
+        9: ["/home/anna/LightGlue/orb_fail_data_distance/secondfail/0300104999936.png",
+            "/home/anna/LightGlue/orb_fail_data_distance/secondfail/0300704999936.png"],
+        10: ["/home/anna/LightGlue/orb_fail_data_distance/secondfail/0300104999936.png",
+            "/home/anna/LightGlue/orb_fail_data_distance/secondfail/0301304999936.png"],
+        11: ["/home/anna/LightGlue/orb_fail_data_distance/thirdfail/0446004999936.png",
+            "/home/anna/LightGlue/orb_fail_data_distance/thirdfail/0446604999936.png"],
+        12: ["/home/anna/LightGlue/orb_fail_data_distance/thirdfail/0446004999936.png",
+            "/home/anna/LightGlue/orb_fail_data_distance/thirdfail/0447204999936.png"],
+            # KITTI
+        13: ["/home/anna/Documents/UW_SLAM/kitti_dataset/dataset/sequences/00/image_0/000000.png", 
+             "/home/anna/Documents/UW_SLAM/kitti_dataset/dataset/sequences/00/image_0/000001.png"],
+        14: ["/home/anna/Documents/UW_SLAM/kitti_dataset/dataset/sequences/00/image_0/000001.png", 
+             "/home/anna/Documents/UW_SLAM/kitti_dataset/dataset/sequences/00/image_0/000002.png"],
+        15: ["/home/anna/Documents/UW_SLAM/kitti_dataset/dataset/sequences/00/image_0/000002.png", 
+             "/home/anna/Documents/UW_SLAM/kitti_dataset/dataset/sequences/00/image_0/000003.png"],
+        16: ["/home/anna/Documents/UW_SLAM/kitti_dataset/dataset/sequences/00/image_0/000003.png", 
+             "/home/anna/Documents/UW_SLAM/kitti_dataset/dataset/sequences/00/image_0/000004.png"],
+        17: ["/home/anna/Documents/UW_SLAM/kitti_dataset/dataset/sequences/00/image_0/000004.png", 
+             "/home/anna/Documents/UW_SLAM/kitti_dataset/dataset/sequences/00/image_0/000005.png"],
+        18: ["/home/anna/Documents/UW_SLAM/kitti_dataset/dataset/sequences/00/image_0/000005.png", 
+             "/home/anna/Documents/UW_SLAM/kitti_dataset/dataset/sequences/00/image_0/000006.png"],
+        19: ["/home/anna/Documents/UW_SLAM/kitti_dataset/dataset/sequences/00/image_0/000006.png", 
+             "/home/anna/Documents/UW_SLAM/kitti_dataset/dataset/sequences/00/image_0/000007.png"],
+        20: ["/home/anna/Documents/UW_SLAM/kitti_dataset/dataset/sequences/00/image_0/000007.png", 
+             "/home/anna/Documents/UW_SLAM/kitti_dataset/dataset/sequences/00/image_0/000008.png"],
+        21: ["/home/anna/Documents/UW_SLAM/kitti_dataset/dataset/sequences/00/image_0/000008.png", 
+             "/home/anna/Documents/UW_SLAM/kitti_dataset/dataset/sequences/00/image_0/000009.png"],
+        22: ["/home/anna/Documents/UW_SLAM/kitti_dataset/dataset/sequences/00/image_0/000009.png", 
+             "/home/anna/Documents/UW_SLAM/kitti_dataset/dataset/sequences/00/image_0/000010.png"]
     }
     
     if sequence not in paths:
@@ -159,6 +178,9 @@ def plot_lightglue(image0, image1, kpts0, kpts1, m_kpts0, m_kpts1, matches01, se
     viz2d.plot_matches(m_kpts0, m_kpts1, color="lime", lw=0.2)
     viz2d.add_text(0, f'Stop after {matches01["stop"]} layers', fs=20)
 
+    # Ensure the output directory exists
+    os.makedirs('output', exist_ok=True)
+
     # Save LIGHTGLUE matches figure
     plt.savefig(f'output/test{sequence_number}_lg_matches.eps', format='eps')
     plt.savefig(f'output/test{sequence_number}_lg_matches.pdf', format='pdf')
@@ -178,6 +200,9 @@ def plot_orb_bf(image0, image1, orb_matches, orb_kpts0, orb_kpts1, sequence_numb
     axes = viz2d.plot_images([image0, image1])
     viz2d.plot_matches(orb_kpts0[orb_matches[:, 0]], orb_kpts1[orb_matches[:, 1]], color="magenta", lw=0.2)
 
+    # Ensure the output directory exists
+    os.makedirs('output', exist_ok=True)
+
     # Save ORB BF matches figure
     plt.savefig(f'output/test{sequence_number}_orb_matches.eps', format='eps')
     plt.savefig(f'output/test{sequence_number}_orb_matches.pdf', format='pdf')
@@ -186,6 +211,7 @@ def plot_orb_bf(image0, image1, orb_matches, orb_kpts0, orb_kpts1, sequence_numb
     viz2d.plot_images([image0, image1])
     viz2d.plot_keypoints([orb_kpts0, orb_kpts1], colors=['red', 'red'], ps=10)
 
+
     plt.savefig(f'output/test{sequence_number}_orb_features.eps', format='eps')
     plt.savefig(f'output/test{sequence_number}_orb_features.pdf', format='pdf')
 
@@ -193,7 +219,7 @@ def plot_orb_bf(image0, image1, orb_matches, orb_kpts0, orb_kpts1, sequence_numb
 
 
 #Save optical flow visualization for a given method (LIGHTGLUE or ORB).
-def save_optical_flow_visualization(image0_path, image1_path, keypoints0, keypoints1, sequence_number, method='lightglue'):
+def save_optical_flow_visualization(image0_path, image1_path, keypoints0, keypoints1, sequence_number, mask, method='lightglue'):
 
     # Read and convert images
     image0_of = cv2.imread(image0_path, cv2.IMREAD_COLOR)
@@ -210,7 +236,7 @@ def save_optical_flow_visualization(image0_path, image1_path, keypoints0, keypoi
     plt.imshow(image1_rgb)
 
     # Choose colors based on method
-    scatter_color, line_color = ('lime', 'red') if method == 'lightglue' else ('blue', 'purple')
+    scatter_color, line_color = ('lime', 'yellow') if method == 'lightglue' else ('blue', 'purple')
 
     # Scatter keypoints on the second image
     plt.scatter(keypoints1[:, 0], keypoints1[:, 1], color=scatter_color, marker='o', s=4, linewidths=0, alpha=1.0)
@@ -223,8 +249,70 @@ def save_optical_flow_visualization(image0_path, image1_path, keypoints0, keypoi
     plt.axis('off')
     plt.tight_layout(pad=0.5)
 
+    # Ensure the output directory exists
+    os.makedirs('output', exist_ok=True)
+
     # Save the figure
-    plt.savefig(f'/output/{method}_optical_flow_test{sequence_number}.eps', format='eps')
-    plt.savefig(f'/output/{method}_optical_flow_test{sequence_number}.pdf', format='pdf')
+    plt.savefig(f'output/{method}_optical_flow_test{sequence_number}.eps', format='eps')
+    plt.savefig(f'output/{method}_optical_flow_test{sequence_number}.pdf', format='pdf')
     plt.show()
 
+def adjust_contrast(image):
+        new_image = np.clip((image - image.min()) * (255 / (image.max() - image.min())), 0, 128).astype(np.uint8)
+        return new_image
+
+#Save optical flow visualization for a given method (LIGHTGLUE or ORB).
+def save_optical_flow_visualization_alternative(image0_path, image1_path, keypoints0, keypoints1, all_keypoints1, sequence_number, method='lightglue'):
+
+    # Read and convert images
+    image0_of = cv2.imread(image0_path, cv2.IMREAD_COLOR)
+    image1_of = cv2.imread(image1_path, cv2.IMREAD_COLOR)
+
+    image0_contrast = adjust_contrast(image0_of)
+    image1_contrast = adjust_contrast(image1_of)
+    
+    image0_rgb = cv2.cvtColor(image0_contrast, cv2.COLOR_BGR2RGB)
+    image1_rgb = cv2.cvtColor(image1_contrast, cv2.COLOR_BGR2RGB)
+
+    # Get image dimensions for adaptive sizing
+    height, width, _ = image1_rgb.shape
+    aspect_ratio = width / height
+    plt.figure(figsize=(aspect_ratio * 6, 6))
+
+    # Display the second image
+    plt.imshow(image1_rgb)
+
+    # Choose colors based on method
+    scatter_color, line_color = ('lime', 'green') if method == 'lightglue' else ('blue', 'purple')
+
+    # Scatter keypoints on the second image
+    #plt.scatter(keypoints1[:, 0], keypoints1[:, 1], color=scatter_color, marker='o', s=4, linewidths=0, alpha=1.0)
+
+    # Convert keypoints1 to a list of cv2.KeyPoint objects
+    keypoints1_cv = [cv2.KeyPoint(float(x), float(y), 1) for x, y in all_keypoints1]
+
+    # Draw keypoints on the second image
+    image1_with_keypoints = cv2.drawKeypoints(image1_rgb, keypoints1_cv, None, color=(0, 255, 0))
+
+    # Ensure image is in RGB format for matplotlib
+    #
+    #  Display the second image with keypoints using matplotlib
+    plt.imshow(image1_with_keypoints)
+
+    # Draw lines between corresponding features
+    for (x1, y1), (x2, y2) in zip(keypoints0, keypoints1):
+        plt.plot([x1, x2], [y1, y2], color=line_color, linewidth=2)
+
+    # Hide axis labels and ticks
+    plt.axis('off')
+    plt.tight_layout(pad=0.5)
+
+    # Ensure the output directory exists
+    os.makedirs('output', exist_ok=True)
+
+    # Save the figure
+    plt.savefig(f'output/{method}_optical_flow_test_alternativ{sequence_number}.eps', format='eps')
+    plt.savefig(f'output/{method}_optical_flow_test_alternativ{sequence_number}.pdf', format='pdf')
+    plt.show()
+
+    
