@@ -66,6 +66,7 @@ def runonentireVAROS():
     counter = 0
     for value in array_of_strings[1:]:
         counter += 1 
+        print("imagenr"+str(counter))
         if value == "0000104999936":
             image0_path = "Datasets/VAROS/cam0/data/0000004999936.png"
         else:
