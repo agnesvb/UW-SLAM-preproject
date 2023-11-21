@@ -1,11 +1,15 @@
 from poseestimationdistance import *
 from lightglue_orb import *
 
-def get_pose(image0, image1, K, method):
+def get_pose(image0_path, image1_path, K, method):
     if method == "lightglue":
+        image0 = load_image(image0_path)
+        image1 = load_image(image1_path)
         matches01, kpts0, kpts1, m_kpts0, m_kpts1 = lightglue(image0, image1)
     elif method == "orb":
-        matches01, kpts0, kpts1, m_kpts0, m_kpts1 = lightglue(image0, image1)
+        image0 = cv2.imread(image0_path, cv2.IMREAD_GRAYSCALE)
+        image1 = cv2.imread(image1_path, cv2.IMREAD_GRAYSCALE)
+        matches01, kpts0, kpts1, m_kpts0, m_kpts1 = orb_bf(image0, image1)
 
     m_kpts0 = np.array(m_kpts0)
     m_kpts1 = np.array(m_kpts1)
@@ -59,7 +63,9 @@ def runonentireVAROS():
         array_of_strings = [line.strip() for line in array_of_strings]
 
     #runthrough VAROS
+    counter = 0
     for value in array_of_strings[1:]:
+        counter += 1 
         if value == "0000104999936":
             image0_path = "Datasets/VAROS/cam0/data/0000004999936.png"
         else:
@@ -67,8 +73,7 @@ def runonentireVAROS():
 
         image1_path = "Datasets/VAROS/cam0/data/"+value+".png"
                 
-        image0 = load_image(image0_path)
-        image1 = load_image(image1_path)
+        
 
 
         #Get Ground truth pose
@@ -81,9 +86,8 @@ def runonentireVAROS():
         GT_pose = relpose(GT_data, t_start, t_end)
 
 
-        #TODO: ADD COUNTER FOR FAILS
         #For LightGlue
-        T_LG = get_pose(image0, image1, K, "lightglue")
+        T_LG = get_pose(image0_path, image1_path, K, "lightglue")
         if not np.all(T_LG == 0):
             rotation_error_deg, translation_error_deg = calculate_pose_error(T_LG, GT_pose)
             rot_errors_LG.append(rotation_error_deg)
@@ -91,14 +95,29 @@ def runonentireVAROS():
         else:
             fails_LG +=1
         #For ORB 
-        T_ORB = get_pose(image0, image1, K, "orb")
+        T_ORB = get_pose(image0_path, image1_path, K, "orb")
         if not np.all(T_ORB == 0):
             rotation_error_deg, translation_error_deg = calculate_pose_error(T_ORB, GT_pose)
             rot_errors_ORB.append(rotation_error_deg)
             trans_errors_ORB.append(translation_error_deg)
         else:
             fails_ORB += 1
-    
+
+        if counter%100 == 0:
+            mean_rot_error_LG = np.mean(rot_errors_LG)
+            mean_trans_error_LG = np.mean(trans_errors_LG)
+            mean_rot_error_ORB = np.mean(rot_errors_ORB)
+            mean_trans_error_ORB = np.mean(trans_errors_ORB)
+            with open("output/entireVAROS.txt", 'w') as file:
+                file.write(f"{mean_rot_error_LG}\n")
+                file.write(f"{mean_trans_error_LG}\n")
+                file.write(f"{fails_LG}\n")
+                file.write(f"{mean_rot_error_ORB}\n")
+                file.write(f"{mean_trans_error_ORB}\n")
+                file.write(f"{fails_ORB}\n")
+
+
+
 
     mean_rot_error_LG = np.mean(rot_errors_LG)
     mean_trans_error_LG = np.mean(trans_errors_LG)
