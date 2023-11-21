@@ -4,13 +4,15 @@ import matplotlib.pyplot as plt
 
 def read_GT_from_file(file_path):
     data = {}
+    R = {}
+    t = {}
     with open(file_path, 'r') as file:
         for line in file:
             if not line.startswith("#"):  # Skip comments
                 row = line.strip().split(",")
                 timestamp = int(float(row[0]))
                 R_matrix = np.zeros((3,3))
-                t = np.zeros(3)
+                t_vec = np.zeros(3)
                 T_matrix = np.zeros((4,4))
                 R_matrix[0,0] = float(row[1])
                 R_matrix[0,1] = float(row[2])
@@ -21,23 +23,35 @@ def read_GT_from_file(file_path):
                 R_matrix[2,0] = float(row[9])
                 R_matrix[2,1] = float(row[10])
                 R_matrix[2,2] = float(row[11])
-                t[0] = float(row[4])
-                t[1] = float(row[8])
-                t[2] = float(row[12])
+                t_vec[0] = float(row[4])
+                t_vec[1] = float(row[8])
+                t_vec[2] = float(row[12])
                 T_matrix[:3, :3] = R_matrix
-                T_matrix[0:3,3] = t.T
+                T_matrix[0:3,3] = t_vec.T
                 T_matrix[3,3] = 1
                 data[timestamp] = T_matrix
-    return data
+                R[timestamp] = R_matrix
+                t[timestamp] = t_vec
+    return data, R, t
 
-def relpose(data, t_start, t_end):
+def relpose(data, R, t, t_start, t_end):
     T1 = data[t_start]
     T2 = data[t_end]
-
+    R1 = R[t_start]
+    R2 = R[t_end]
+    t1 = t[t_start]
+    t2 = t[t_end]
     T1inv= np.linalg.inv(T1)
     Trel = np.dot(T1inv,T2)
+    R1inv = np.transpose(R1)
+    t1inv = np.dot(-R1inv,t1)
+    Trel_alt = np.zeros((4,4))
+    Trel_alt[:3, :3] = np.dot(R1inv,R2)
+    Trel_alt[0:3,3] = np.dot(R1inv, t2) + t1inv
+    Trel_alt[3,3] = 1
 
-    return Trel
+
+    return Trel_alt
 
 def relpose_from_matches(matches1_path, matches2_path, K):
     coordinates1 = np.loadtxt(matches1_path)
@@ -47,7 +61,7 @@ def relpose_from_matches(matches1_path, matches2_path, K):
         return 0
 
     E, mask = cv2.findEssentialMat(coordinates1, coordinates2, K,method=cv2.RANSAC, prob=0.999, threshold=1 )
-
+    print(mask)
     if np.shape(E) != (3,3):
         #Means we cannot recover pose
         print("number of matches: " + str(np.shape(coordinates1)[0]))
@@ -211,8 +225,8 @@ def pose_estimation(timestamps):
         
         print()
         #calculating ground truth pose
-        GT_data = read_GT_from_file(GT_path)
-        GT_pose = relpose(GT_data, t_start, t_end)
+        GT_data, R, t = read_GT_from_file(GT_path)
+        GT_pose = relpose(GT_data, R, t, t_start, t_end)
         print(" The grond truth pose is: ")
         print(GT_pose)
         print("the baseline is")

@@ -5,13 +5,13 @@ from runonentireVAROS import *
 
 
 #Run LightGlue and ORb+BF on entire VAROS
-mean_rot_error_LG, mean_trans_error_LG, fails_LG, mean_rot_error_ORB, mean_trans_error_ORB, fails_ORB = runonentireVAROS()
-print(mean_rot_error_LG)
-print(mean_trans_error_LG)
-print(fails_LG)
-print(mean_rot_error_ORB)
-print(mean_trans_error_ORB)
-print(fails_ORB)
+#mean_rot_error_LG, mean_trans_error_LG, fails_LG, mean_rot_error_ORB, mean_trans_error_ORB, fails_ORB = runonentireVAROS()
+#print(mean_rot_error_LG)
+#print(mean_trans_error_LG)
+#print(fails_LG)
+#print(mean_rot_error_ORB)
+#print(mean_trans_error_ORB)
+#print(fails_ORB)
 
 timestamps = np.array([
     [165804999936, 165904999936],
@@ -58,7 +58,7 @@ for sequence_number in range(1, 13):
 """   
 
 #Use files to calculate relative pose difference
-#pose_estimation(timestamps)
+pose_estimation(timestamps)
 
 #Mark matches as correct or false based on GT rel pose
 #findoutliers(timestamps)
