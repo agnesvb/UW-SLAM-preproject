@@ -4,13 +4,15 @@ import matplotlib.pyplot as plt
 
 def read_GT_from_file(file_path):
     data = {}
+    R = {}
+    t = {}
     with open(file_path, 'r') as file:
         for line in file:
             if not line.startswith("#"):  # Skip comments
                 row = line.strip().split(",")
                 timestamp = int(float(row[0]))
                 R_matrix = np.zeros((3,3))
-                t = np.zeros(3)
+                t_vec = np.zeros(3)
                 T_matrix = np.zeros((4,4))
                 R_matrix[0,0] = float(row[1])
                 R_matrix[0,1] = float(row[2])
@@ -21,14 +23,36 @@ def read_GT_from_file(file_path):
                 R_matrix[2,0] = float(row[9])
                 R_matrix[2,1] = float(row[10])
                 R_matrix[2,2] = float(row[11])
-                t[0] = float(row[4])
-                t[1] = float(row[8])
-                t[2] = float(row[12])
+                t_vec[0] = float(row[4])
+                t_vec[1] = float(row[8])
+                t_vec[2] = float(row[12])
                 T_matrix[:3, :3] = R_matrix
-                T_matrix[0:3,3] = t.T
+                T_matrix[0:3,3] = t_vec.T
                 T_matrix[3,3] = 1
                 data[timestamp] = T_matrix
+                R[timestamp] = R_matrix
+                t[timestamp] = t_vec
     return data
+
+def relposeALT(data, R, t, t_start, t_end):
+    T1 = data[t_start]
+    T2 = data[t_end]
+    R1 = R[t_start]
+    R2 = R[t_end]
+    t1 = t[t_start]
+    t2 = t[t_end]
+    T1inv= np.linalg.inv(T1)
+    Trel = np.dot(T1inv,T2)
+    R1inv = np.transpose(R1)
+    t1inv = np.dot(-R1inv,t1)
+    Trel_alt = np.zeros((4,4))
+    Trel_alt[:3, :3] = np.dot(R1inv,R2)
+    Trel_alt[0:3,3] = np.dot(R1inv, t2) + t1inv
+    Trel_alt[3,3] = 1
+
+
+    return Trel_alt
+
 
 def relpose(data, t_start, t_end):
     T1 = data[t_start]
@@ -47,7 +71,6 @@ def relpose_from_matches(matches1_path, matches2_path, K):
         return 0
 
     E, mask = cv2.findEssentialMat(coordinates1, coordinates2, K,method=cv2.RANSAC, prob=0.999, threshold=1 )
-
     if np.shape(E) != (3,3):
         #Means we cannot recover pose
         print("number of matches: " + str(np.shape(coordinates1)[0]))
@@ -64,26 +87,6 @@ def relpose_from_matches(matches1_path, matches2_path, K):
 
     return T_matrix
 
-def decompose_essential_matrix(E):
-    # Singular Value Decomposition of the essential matrix
-    U, _, Vt = np.linalg.svd(E)
-
-    # Ensure proper rotation matrices and translation vectors
-    R1 = U @ np.array([[1, 0, 0], [0, 1, 0], [0, 0, np.linalg.det(U @ Vt)]]) @ Vt
-    R2 = U @ np.array([[1, 0, 0], [0, 1, 0], [0, 0, -np.linalg.det(U @ Vt)]]) @ Vt
-    t1 = U[:, 2]
-    t2 = -U[:, 2]
-
-    # Ensure that the determinant of rotation matrices is positive
-    if np.linalg.det(R1) < 0:
-        R1 = -R1
-        t1 = -t1
-
-    if np.linalg.det(R2) < 0:
-        R2 = -R2
-        t2 = -t2
-
-    return R1, t1, R2, t2
 
 def calculate_pose_error(Matches_pose, GT_pose): 
 
@@ -101,10 +104,10 @@ def calculate_pose_error(Matches_pose, GT_pose):
     rotation_error_deg = np.degrees(angle_diff)
 
     # ----ALTERNATIVE----
-    R = R_ab_Matches - R_ab_GT
-    R_angle_diff= np.arccos((np.trace(R)-1)/2)
+    #R = R_ab_Matches - R_ab_GT
+    #R_angle_diff= np.arccos((np.trace(R)-1)/2)
     # Convert to degrees
-    rotation_error_deg_alt2= np.degrees(R_angle_diff)
+    #rotation_error_deg_alt2= np.degrees(R_angle_diff)
     #print("----")
     #print("the two alternatives for rotation error")
     #print(rotation_error_deg)
@@ -124,7 +127,7 @@ def calculate_pose_error(Matches_pose, GT_pose):
     translation_error_deg = np.degrees(angular_difference_rad)
 
     if t_ab_Matches[2] < 0:
-        print("negative z-value detected")
+        print("negative z-value detected, turning t")
         t_ab_Matches_turned = - t_ab_Matches
         #Translational error
         normalized_t_ab_Matches_turned = t_ab_Matches_turned / np.linalg.norm(t_ab_Matches_turned)
@@ -132,12 +135,11 @@ def calculate_pose_error(Matches_pose, GT_pose):
         dot_product_turned = np.dot(normalized_t_ab_Matches_turned, normalized_t_ab_GT)
         angular_difference_rad_turned = np.arccos(dot_product_turned)
         # Convert to degrees
-        translation_error_deg_turned = np.degrees(angular_difference_rad_turned)
-        print("the translational error for a turned t is:" + str(translation_error_deg_turned) + "degrees")
+        translation_error_deg = np.degrees(angular_difference_rad_turned)
 
 
 
-    return rotation_error_deg, translation_error_deg
+    return np.abs(rotation_error_deg), np.abs(translation_error_deg)
 
 def get_paths():
     matches_paths_LightGlue = np.array([
