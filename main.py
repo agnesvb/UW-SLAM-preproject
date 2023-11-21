@@ -49,7 +49,7 @@ for sequence_number in range(1, 13):
     orb_matches, orb_kpts0, orb_kpts1, orb_m_kpts0, orb_m_kpts1 = orb_bf(orb_image0, orb_image1)
     
     save_keypoints_to_file(sequence_number, orb_m_kpts0, 1, method='orb', output_dir='output')
-    save_keypoints_to_file(sequence_number, orb_m_kpts0, 2, method='orb', output_dir='output')
+    save_keypoints_to_file(sequence_number, orb_m_kpts1, 2, method='orb', output_dir='output')
     
     #Plot results
     plot_lightglue(image0, image1, kpts0, kpts1, m_kpts0, m_kpts1, matches01, sequence_number)
