@@ -160,8 +160,8 @@ def plot_lightglue(image0, image1, kpts0, kpts1, m_kpts0, m_kpts1, matches01, se
     viz2d.add_text(0, f'Stop after {matches01["stop"]} layers', fs=20)
 
     # Save LIGHTGLUE matches figure
-    plt.savefig(f'/output/test{sequence_number}_lg_matches.eps', format='eps')
-    plt.savefig(f'/output/test{sequence_number}_lg_matches.pdf', format='pdf')
+    plt.savefig(f'output/test{sequence_number}_lg_matches.eps', format='eps')
+    plt.savefig(f'output/test{sequence_number}_lg_matches.pdf', format='pdf')
 
     ## LIGHTGLUE KEYPOINTS ##
     kpc0, kpc1 = viz2d.cm_prune(matches01["prune0"]), viz2d.cm_prune(matches01["prune1"])
@@ -169,8 +169,8 @@ def plot_lightglue(image0, image1, kpts0, kpts1, m_kpts0, m_kpts1, matches01, se
     viz2d.plot_keypoints([kpts0, kpts1], colors=[kpc0, kpc1], ps=10)
 
     # Save LIGHTGLUE keypoints figure
-    plt.savefig(f'/output/test{sequence_number}_lg_features.eps', format='eps')
-    plt.savefig(f'/output/test{sequence_number}_lg_features.pdf', format='pdf')
+    plt.savefig(f'output/test{sequence_number}_lg_features.eps', format='eps')
+    plt.savefig(f'output/test{sequence_number}_lg_features.pdf', format='pdf')
 
 
 def plot_orb_bf(image0, image1, orb_matches, orb_kpts0, orb_kpts1, sequence_number):
@@ -179,15 +179,15 @@ def plot_orb_bf(image0, image1, orb_matches, orb_kpts0, orb_kpts1, sequence_numb
     viz2d.plot_matches(orb_kpts0[orb_matches[:, 0]], orb_kpts1[orb_matches[:, 1]], color="magenta", lw=0.2)
 
     # Save ORB BF matches figure
-    plt.savefig(f'/output/test{sequence_number}_orb_matches.eps', format='eps')
-    plt.savefig(f'/output/test{sequence_number}_orb_matches.pdf', format='pdf')
+    plt.savefig(f'output/test{sequence_number}_orb_matches.eps', format='eps')
+    plt.savefig(f'output/test{sequence_number}_orb_matches.pdf', format='pdf')
 
     ## ORB FEATURES ##
     viz2d.plot_images([image0, image1])
     viz2d.plot_keypoints([orb_kpts0, orb_kpts1], colors=['red', 'red'], ps=10)
 
-    plt.savefig(f'/output/test{sequence_number}_orb_features.eps', format='eps')
-    plt.savefig(f'/output/test{sequence_number}_orb_features.pdf', format='pdf')
+    plt.savefig(f'output/test{sequence_number}_orb_features.eps', format='eps')
+    plt.savefig(f'output/test{sequence_number}_orb_features.pdf', format='pdf')
 
     plt.show()
 
