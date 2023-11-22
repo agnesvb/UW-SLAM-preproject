@@ -68,15 +68,14 @@ def relpose_from_matches(matches1_path, matches2_path, K):
     coordinates2 = np.loadtxt(matches2_path)
     if np.shape(coordinates1)[0] < 5:
         print("ERROR: too few matches")
-        return 0
+        return None, None
 
-    E, mask = cv2.findEssentialMat(coordinates1, coordinates2, K,method=cv2.RANSAC, prob=0.999, threshold=1 )
+    E, mask = cv2.findEssentialMat(coordinates1, coordinates2, K, method=cv2.RANSAC, prob=0.999, threshold=1)
     if np.shape(E) != (3,3):
-        #Means we cannot recover pose
         print("number of matches: " + str(np.shape(coordinates1)[0]))
-        return 0
+        return None, None
     
-    points, R, t, mask = cv2.recoverPose(E,coordinates1, coordinates2) #The number of inliners which pass the cheirality test
+    points, R, t, _ = cv2.recoverPose(E,coordinates1, coordinates2) #The number of inliners which pass the cheirality test
     #R1, t1, R2, t2 = decompose_essential_matrix(E)
     #return R1, t1, R2, t2
 
@@ -85,7 +84,7 @@ def relpose_from_matches(matches1_path, matches2_path, K):
     T_matrix[0:3,3] = t.T
     T_matrix[3,3] = 1
 
-    return T_matrix
+    return T_matrix, mask
 
 
 def calculate_pose_error(Matches_pose, GT_pose): 
@@ -113,9 +112,6 @@ def calculate_pose_error(Matches_pose, GT_pose):
     #print(rotation_error_deg)
     #print(rotation_error_deg_alt2)
     #print("----")
-    
-
-
 
     #Translational error
     normalized_t_ab_Matches = t_ab_Matches / np.linalg.norm(t_ab_Matches)
@@ -155,7 +151,9 @@ def get_paths():
     ["output/test9_matches/test9_lightglue_image1.txt","output/test9_matches/test9_lightglue_image2.txt"],
     ["output/test10_matches/test10_lightglue_image1.txt","output/test10_matches/test10_lightglue_image2.txt"],
     ["output/test11_matches/test11_lightglue_image1.txt","output/test11_matches/test11_lightglue_image2.txt"],
-    ["output/test12_matches/test12_lightglue_image1.txt","output/test12_matches/test12_lightglue_image2.txt"]
+    ["output/test12_matches/test12_lightglue_image1.txt","output/test12_matches/test12_lightglue_image2.txt"],
+    #easy test
+    ["output/test13_lightglue_image1.txt", "output/test13_lightglue_image2.txt"]
 ])
     matches_paths_ORB = np.array([
     ["output/test1_matches/test1_orb_image1.txt", "output/test1_matches/test1_orb_image2.txt"],
@@ -170,11 +168,12 @@ def get_paths():
     ["output/test9_matches/test9_orb_image1.txt","output/test9_matches/test9_orb_image2.txt"],
     ["output/test10_matches/test10_orb_image1.txt","output/test10_matches/test10_orb_image2.txt"],
     ["output/test11_matches/test11_orb_image1.txt","output/test11_matches/test11_orb_image2.txt"],
-    ["output/test12_matches/test12_orb_image1.txt","output/test12_matches/test12_orb_image2.txt"]
+    ["output/test12_matches/test12_orb_image1.txt","output/test12_matches/test12_orb_image2.txt"],
+    #easy test
+    ["output/test13_orb_image1.txt", "output/test13_orb_image2.txt"]
 ])
 
     return matches_paths_LightGlue, matches_paths_ORB
-
 
 
 def pose_estimation(timestamps):
@@ -192,6 +191,8 @@ def pose_estimation(timestamps):
                 [0, 0, 1]])
    
 
+    masksLG = []
+    masksORB = []
     
     #array of paths to matches for LightGlue, and ORB-features
     matches_paths_LightGlue, matches_paths_ORB = get_paths()
@@ -227,8 +228,9 @@ def pose_estimation(timestamps):
         matches2_path = matches_paths_LightGlue[i,1]
 
 
-        Matches_pose = relpose_from_matches(matches1_path, matches2_path, K)
-        if not np.all(Matches_pose == 0):
+        Matches_pose, mask_lg = relpose_from_matches(matches1_path, matches2_path, K)
+        masksLG.append(mask_lg)
+        if Matches_pose is not None:
             rotation_error_deg, translation_error_deg = calculate_pose_error(Matches_pose, GT_pose)
             print("And the pose from the LightGlue matches is:")
             print(Matches_pose)
@@ -242,8 +244,9 @@ def pose_estimation(timestamps):
         matches1_path = matches_paths_ORB[i,0]
         matches2_path = matches_paths_ORB[i,1]
         
-        Matches_pose = relpose_from_matches(matches1_path, matches2_path, K)
-        if not np.all(Matches_pose == 0):
+        Matches_pose, mask_orb = relpose_from_matches(matches1_path, matches2_path, K)
+        masksORB.append(mask_orb)
+        if Matches_pose is not None:
             rotation_error_deg, translation_error_deg = calculate_pose_error(Matches_pose, GT_pose)
             print("And the pose from the ORB-features with brute force matches is:")
             print(Matches_pose)
@@ -251,6 +254,13 @@ def pose_estimation(timestamps):
             print(f"Translation Error: {translation_error_deg:.2f} degrees")
         else: 
             print("Could not recover pose for ORB-features with brute force matches, probably to few matches")
+
+    #masksLG = np.array(masksLG)
+    #masksORB = np.array(masksORB)
+
+    return masksLG, masksORB
+
+    
 
     
 
