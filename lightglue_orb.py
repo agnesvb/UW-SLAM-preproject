@@ -101,6 +101,11 @@ def orb_bf(orb_image0, orb_image1):
     orb_kpts0, orb_desc0 = orb.detectAndCompute(orb_image0, None)
     orb_kpts1, orb_desc1 = orb.detectAndCompute(orb_image1, None)
 
+    # Stop if noe features where detected
+    if len(orb_kpts0) == 0 or len(orb_desc0) == 0 or len(orb_kpts1) == 0 or len(orb_desc1) == 0:
+        print("NO ORB FEATURES DETECTED")
+        return False, False, False, False, False
+
     # Match ORB features with a BFMatcher
     bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
     orb_matches = bf.match(orb_desc0, orb_desc1)

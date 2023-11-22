@@ -5,6 +5,7 @@ from runonentireVAROS import *
 
 
 #Run LightGlue and ORb+BF on entire VAROS
+"""
 mean_rot_error_LG, mean_trans_error_LG, fails_LG, mean_rot_error_ORB, mean_trans_error_ORB, fails_ORB = runonentireVAROS()
 print(mean_rot_error_LG)
 print(mean_trans_error_LG)
@@ -12,6 +13,8 @@ print(fails_LG)
 print(mean_rot_error_ORB)
 print(mean_trans_error_ORB)
 print(fails_ORB)
+"""
+
 
 
 timestamps = np.array([
@@ -57,7 +60,7 @@ for sequence_number in range(1, 13):
     save_optical_flow_visualization(image0_path, image1_path, m_kpts0, m_kpts1, sequence_number, method='lightglue', )
     save_optical_flow_visualization(image0_path, image1_path, orb_m_kpts0, orb_m_kpts1, sequence_number, method='orb')
     
-
+"""
 #Use files to calculate relative pose difference
 pose_estimation(timestamps)
 

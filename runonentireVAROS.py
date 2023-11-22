@@ -11,6 +11,8 @@ def get_pose(image0_path, image1_path, K, method):
         image1 = cv2.imread(image1_path, cv2.IMREAD_GRAYSCALE)
         matches01, kpts0, kpts1, m_kpts0, m_kpts1 = orb_bf(image0, image1)
 
+    if np.all(matches01 == False):
+        return 0
     m_kpts0 = np.array(m_kpts0)
     m_kpts1 = np.array(m_kpts1)
     E, mask = cv2.findEssentialMat(m_kpts0, m_kpts1, K,method=cv2.RANSAC, prob=0.999, threshold=1 )
@@ -66,6 +68,7 @@ def runonentireVAROS():
     counter = 0
     for value in array_of_strings[1:]:
         counter += 1 
+
         print("imagenr"+str(counter))
         if value == "0000104999936":
             image0_path = "Datasets/VAROS/cam0/data/0000004999936.png"
