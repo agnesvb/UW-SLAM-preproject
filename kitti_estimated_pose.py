@@ -8,7 +8,36 @@ def load_timestamps(file_path):
         timestamps = np.array([float(line.strip()) for line in file])
     return timestamps
 
-def get_paths():
+def set_image_paths_kitti(sequence):
+    paths = {
+            # KITTI
+        1: ["/home/anna/Documents/UW_SLAM/kitti_dataset/dataset/sequences/00/image_0/000000.png", 
+             "/home/anna/Documents/UW_SLAM/kitti_dataset/dataset/sequences/00/image_0/000001.png"],
+        2: ["/home/anna/Documents/UW_SLAM/kitti_dataset/dataset/sequences/00/image_0/000001.png", 
+             "/home/anna/Documents/UW_SLAM/kitti_dataset/dataset/sequences/00/image_0/000002.png"],
+        3: ["/home/anna/Documents/UW_SLAM/kitti_dataset/dataset/sequences/00/image_0/000002.png", 
+             "/home/anna/Documents/UW_SLAM/kitti_dataset/dataset/sequences/00/image_0/000003.png"],
+        4: ["/home/anna/Documents/UW_SLAM/kitti_dataset/dataset/sequences/00/image_0/000003.png", 
+             "/home/anna/Documents/UW_SLAM/kitti_dataset/dataset/sequences/00/image_0/000004.png"],
+        5: ["/home/anna/Documents/UW_SLAM/kitti_dataset/dataset/sequences/00/image_0/000004.png", 
+             "/home/anna/Documents/UW_SLAM/kitti_dataset/dataset/sequences/00/image_0/000005.png"],
+        6: ["/home/anna/Documents/UW_SLAM/kitti_dataset/dataset/sequences/00/image_0/000005.png", 
+             "/home/anna/Documents/UW_SLAM/kitti_dataset/dataset/sequences/00/image_0/000006.png"],
+        7: ["/home/anna/Documents/UW_SLAM/kitti_dataset/dataset/sequences/00/image_0/000006.png", 
+             "/home/anna/Documents/UW_SLAM/kitti_dataset/dataset/sequences/00/image_0/000007.png"],
+        8: ["/home/anna/Documents/UW_SLAM/kitti_dataset/dataset/sequences/00/image_0/000007.png", 
+             "/home/anna/Documents/UW_SLAM/kitti_dataset/dataset/sequences/00/image_0/000008.png"],
+        9: ["/home/anna/Documents/UW_SLAM/kitti_dataset/dataset/sequences/00/image_0/000008.png", 
+             "/home/anna/Documents/UW_SLAM/kitti_dataset/dataset/sequences/00/image_0/000009.png"],
+        10: ["/home/anna/Documents/UW_SLAM/kitti_dataset/dataset/sequences/00/image_0/000009.png", 
+             "/home/anna/Documents/UW_SLAM/kitti_dataset/dataset/sequences/00/image_0/000010.png"],
+    }
+
+    if sequence not in paths:
+        raise ValueError("Unknown sequence number.")
+    return paths[sequence]
+
+def get_paths_kitti():
     matches_paths_lg_kitti = np.array([
     ["output/test13_lightglue_image1.txt", "output/test13_lightglue_image2.txt"],
     ["output/test14_lightglue_image1.txt", "output/test14_lightglue_image2.txt"],
@@ -67,7 +96,7 @@ def pose_estimation_kitti(timestamps):
 
     
     #array of paths to matches for LightGlue, and ORB-features
-    matches_paths_LightGlue, matches_paths_ORB = get_paths()
+    matches_paths_LightGlue, matches_paths_ORB = get_paths_kitti()
 
     #Saving results in a matrix, one row for each test and the first column for rotational error and second for translational error
     Results_LightGlue = np.zeros(np.shape(timestamps))
