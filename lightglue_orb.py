@@ -34,7 +34,7 @@ extractor = SuperPoint(max_num_keypoints=2048).eval().to(device)  # load the ext
 matcher = LightGlue(features="superpoint").eval().to(device)
 
 # Initialize ORB detector
-orb = cv2.ORB_create(nfeatures=100) 
+orb = cv2.ORB_create(nfeatures=500) 
 
 ## ORB FAILED SEQUENCE 1 ##
 
@@ -65,33 +65,14 @@ def set_image_paths(sequence):
             "/home/anna/LightGlue/orb_fail_data_distance/thirdfail/0446604999936.png"],
         12: ["/home/anna/LightGlue/orb_fail_data_distance/thirdfail/0446004999936.png",
             "/home/anna/LightGlue/orb_fail_data_distance/thirdfail/0447204999936.png"],
-            # KITTI
-        13: ["/home/anna/Documents/UW_SLAM/kitti_dataset/dataset/sequences/00/image_0/000000.png", 
-             "/home/anna/Documents/UW_SLAM/kitti_dataset/dataset/sequences/00/image_0/000001.png"],
-        14: ["/home/anna/Documents/UW_SLAM/kitti_dataset/dataset/sequences/00/image_0/000001.png", 
-             "/home/anna/Documents/UW_SLAM/kitti_dataset/dataset/sequences/00/image_0/000002.png"],
-        15: ["/home/anna/Documents/UW_SLAM/kitti_dataset/dataset/sequences/00/image_0/000002.png", 
-             "/home/anna/Documents/UW_SLAM/kitti_dataset/dataset/sequences/00/image_0/000003.png"],
-        16: ["/home/anna/Documents/UW_SLAM/kitti_dataset/dataset/sequences/00/image_0/000003.png", 
-             "/home/anna/Documents/UW_SLAM/kitti_dataset/dataset/sequences/00/image_0/000004.png"],
-        17: ["/home/anna/Documents/UW_SLAM/kitti_dataset/dataset/sequences/00/image_0/000004.png", 
-             "/home/anna/Documents/UW_SLAM/kitti_dataset/dataset/sequences/00/image_0/000005.png"],
-        18: ["/home/anna/Documents/UW_SLAM/kitti_dataset/dataset/sequences/00/image_0/000005.png", 
-             "/home/anna/Documents/UW_SLAM/kitti_dataset/dataset/sequences/00/image_0/000006.png"],
-        19: ["/home/anna/Documents/UW_SLAM/kitti_dataset/dataset/sequences/00/image_0/000006.png", 
-             "/home/anna/Documents/UW_SLAM/kitti_dataset/dataset/sequences/00/image_0/000007.png"],
-        20: ["/home/anna/Documents/UW_SLAM/kitti_dataset/dataset/sequences/00/image_0/000007.png", 
-             "/home/anna/Documents/UW_SLAM/kitti_dataset/dataset/sequences/00/image_0/000008.png"],
-        21: ["/home/anna/Documents/UW_SLAM/kitti_dataset/dataset/sequences/00/image_0/000008.png", 
-             "/home/anna/Documents/UW_SLAM/kitti_dataset/dataset/sequences/00/image_0/000009.png"],
-        22: ["/home/anna/Documents/UW_SLAM/kitti_dataset/dataset/sequences/00/image_0/000009.png", 
-             "/home/anna/Documents/UW_SLAM/kitti_dataset/dataset/sequences/00/image_0/000010.png"]
+            #easy test
+        13: ["/home/anna/testgithub2/UW-SLAM-preproject/Datasets/VAROS/cam0/data/0277504999936.png",
+             "/home/anna/testgithub2/UW-SLAM-preproject/Datasets/VAROS/cam0/data/0277604999936.png"],
     }
-    
+
     if sequence not in paths:
         raise ValueError("Unknown sequence number.")
     return paths[sequence]
-
 
 def lightglue(image0, image1):
     feats0 = extractor.extract(image0.to(device))
@@ -170,20 +151,48 @@ def save_keypoints_to_file(sequence, keypoints, image_number, method='lightglue'
     print(f"Saved {method.upper()} matches for image {image_number} in sequence {sequence} to {file_name}")
 
 
+def adjust_contrast(image):
+    if isinstance(image, torch.Tensor):
+        # Convert the tensor to a NumPy array
+        image = image.cpu().numpy() if image.is_cuda else image.numpy()
 
-def plot_lightglue(image0, image1, kpts0, kpts1, m_kpts0, m_kpts1, matches01, sequence_number):
+    if image.ndim == 3 and image.shape[0] in [1, 3]:  # Check for channel-first format
+        image = np.transpose(image, (1, 2, 0))  # Convert to channel-last format
+
+    # Adjust the contrast (assuming image is in uint8 format)
+    new_image = np.clip((image - image.min()) * (255 / (image.max() - image.min())), 128, 255)
+    new_image = new_image.astype(np.uint8)
     
+    return new_image
+
+
+def plot_lightglue(image0, image1, kpts0, kpts1, m_kpts0, m_kpts1, matches01, sequence_number, mask, adjust_contrast_flag=False):
+    contrast_suffix = ""
+    if adjust_contrast_flag:
+        image0 = adjust_contrast(image0)
+        image1 = adjust_contrast(image1)
+        contrast_suffix = "_lowcontrast"
      ## LIGHTGLUE MATCHES ##
     axes = viz2d.plot_images([image0, image1])
-    viz2d.plot_matches(m_kpts0, m_kpts1, color="lime", lw=0.2)
-    viz2d.add_text(0, f'Stop after {matches01["stop"]} layers', fs=20)
+    # Plot all keypoints
+    viz2d.plot_keypoints([kpts0, kpts1], colors=['yellow', 'yellow'], ps=10)
+
+    if mask.any() == None:
+        viz2d.plot_matches(m_kpts0, m_kpts1, color="lime", lw=0.2)
+    else:    
+        for i in range(len(m_kpts0)):
+            color = 'red' if mask[i] == 0 else 'lime'
+            viz2d.plot_matches(m_kpts0[i:i+1], m_kpts1[i:i+1], color=color, lw=0.2)
+    
+    #viz2d.add_text(0, f'Stop after {matches01["stop"]} layers', fs=20)
+    viz2d.add_text(0, "Lightglue" , fs=20)
 
     # Ensure the output directory exists
     os.makedirs('output', exist_ok=True)
 
     # Save LIGHTGLUE matches figure
-    plt.savefig(f'output/test{sequence_number}_lg_matches.eps', format='eps')
-    plt.savefig(f'output/test{sequence_number}_lg_matches.pdf', format='pdf')
+    plt.savefig(f'output/test{sequence_number}{contrast_suffix}_lg_matches.eps', format='eps')
+    plt.savefig(f'output/test{sequence_number}{contrast_suffix}_lg_matches.pdf', format='pdf')
 
     ## LIGHTGLUE KEYPOINTS ##
     kpc0, kpc1 = viz2d.cm_prune(matches01["prune0"]), viz2d.cm_prune(matches01["prune1"])
@@ -191,42 +200,67 @@ def plot_lightglue(image0, image1, kpts0, kpts1, m_kpts0, m_kpts1, matches01, se
     viz2d.plot_keypoints([kpts0, kpts1], colors=[kpc0, kpc1], ps=10)
 
     # Save LIGHTGLUE keypoints figure
-    plt.savefig(f'output/test{sequence_number}_lg_features.eps', format='eps')
-    plt.savefig(f'output/test{sequence_number}_lg_features.pdf', format='pdf')
+    plt.savefig(f'output/test{sequence_number}{contrast_suffix}_lg_features.eps', format='eps')
+    plt.savefig(f'output/test{sequence_number}{contrast_suffix}_lg_features.pdf', format='pdf')
 
 
-def plot_orb_bf(image0, image1, orb_matches, orb_kpts0, orb_kpts1, sequence_number):
+def plot_orb_bf(image0, image1, orb_matches, orb_kpts0, orb_kpts1, sequence_number, mask, adjust_contrast_flag=False):
+    contrast_suffix = ""
+    if adjust_contrast_flag:
+        image0 = adjust_contrast(image0)
+        image1 = adjust_contrast(image1)
+        contrast_suffix = "_lowcontrast"
     ## ORB BF MATCHES ##
     axes = viz2d.plot_images([image0, image1])
-    viz2d.plot_matches(orb_kpts0[orb_matches[:, 0]], orb_kpts1[orb_matches[:, 1]], color="magenta", lw=0.2)
+    # Plot all ORB keypoints
+    viz2d.plot_keypoints([orb_kpts0, orb_kpts1], colors=['yellow', 'yellow'], ps=10)
 
+    if mask.any() == None: 
+        viz2d.plot_matches(orb_kpts0[orb_matches[:, 0]], orb_kpts1[orb_matches[:, 1]], color="lime", lw=0.2)
+    else:
+        correct_kpts0 = np.array([orb_kpts0[idx] for idx, m in zip(orb_matches[:, 0], mask) if m != 0])
+        correct_kpts1 = np.array([orb_kpts1[idx] for idx, m in zip(orb_matches[:, 1], mask) if m != 0])
+        if len(correct_kpts0) > 0 and len(correct_kpts1) > 0:
+            viz2d.plot_matches(correct_kpts0, correct_kpts1, color="lime", lw=0.2)
+
+        incorrect_kpts0 = np.array([orb_kpts0[idx] for idx, m in zip(orb_matches[:, 0], mask) if m == 0])
+        incorrect_kpts1 = np.array([orb_kpts1[idx] for idx, m in zip(orb_matches[:, 1], mask) if m == 0])
+        if len(incorrect_kpts0) > 0 and len(incorrect_kpts1) > 0:
+            viz2d.plot_matches(incorrect_kpts0, incorrect_kpts1, color="red", lw=0.2)
+
+    viz2d.add_text(0, "Orb & Brute Force" , fs=20)
     # Ensure the output directory exists
     os.makedirs('output', exist_ok=True)
 
     # Save ORB BF matches figure
-    plt.savefig(f'output/test{sequence_number}_orb_matches.eps', format='eps')
-    plt.savefig(f'output/test{sequence_number}_orb_matches.pdf', format='pdf')
+    plt.savefig(f'output/test{sequence_number}{contrast_suffix}_orb_matches.eps', format='eps')
+    plt.savefig(f'output/test{sequence_number}{contrast_suffix}_orb_matches.pdf', format='pdf')
 
     ## ORB FEATURES ##
     viz2d.plot_images([image0, image1])
     viz2d.plot_keypoints([orb_kpts0, orb_kpts1], colors=['red', 'red'], ps=10)
 
 
-    plt.savefig(f'output/test{sequence_number}_orb_features.eps', format='eps')
-    plt.savefig(f'output/test{sequence_number}_orb_features.pdf', format='pdf')
+    plt.savefig(f'output/test{sequence_number}{contrast_suffix}_orb_features.eps', format='eps')
+    plt.savefig(f'output/test{sequence_number}{contrast_suffix}_orb_features.pdf', format='pdf')
 
-    plt.show()
+    #plt.show()
 
 
 #Save optical flow visualization for a given method (LIGHTGLUE or ORB).
-def save_optical_flow_visualization(image0_path, image1_path, keypoints0, keypoints1, sequence_number, mask, method='lightglue'):
+def save_optical_flow_visualization(image1_path, keypoints0, keypoints1, all_keypoints1, sequence_number, mask, method='lightglue', adjust_contrast_flag=False):
 
-    # Read and convert images
-    image0_of = cv2.imread(image0_path, cv2.IMREAD_COLOR)
+    ## Read and convert image
     image1_of = cv2.imread(image1_path, cv2.IMREAD_COLOR)
-    image0_rgb = cv2.cvtColor(image0_of, cv2.COLOR_BGR2RGB)
+
+    contrast_suffix = ""
+    if adjust_contrast_flag:
+        image1_of = adjust_contrast(image1_of)
+        contrast_suffix = "_lowcontrast"
+
     image1_rgb = cv2.cvtColor(image1_of, cv2.COLOR_BGR2RGB)
 
+
     # Get image dimensions for adaptive sizing
     height, width, _ = image1_rgb.shape
     aspect_ratio = width / height
@@ -235,74 +269,48 @@ def save_optical_flow_visualization(image0_path, image1_path, keypoints0, keypoi
     # Display the second image
     plt.imshow(image1_rgb)
 
-    # Choose colors based on method
-    scatter_color, line_color = ('lime', 'yellow') if method == 'lightglue' else ('blue', 'purple')
+    # Convert keypoints1 to a set of tuples for easy comparison
 
-    # Scatter keypoints on the second image
-    plt.scatter(keypoints1[:, 0], keypoints1[:, 1], color=scatter_color, marker='o', s=4, linewidths=0, alpha=1.0)
+    if isinstance(keypoints1, torch.Tensor):
+        keypoints1 = keypoints1.cpu().numpy() if keypoints1.is_cuda else keypoints1.numpy()
 
-    # Draw lines between corresponding features
-    for (x1, y1), (x2, y2) in zip(keypoints0, keypoints1):
-        plt.plot([x1, x2], [y1, y2], color=line_color, linewidth=1)
-
-    # Hide axis labels and ticks
-    plt.axis('off')
-    plt.tight_layout(pad=0.5)
-
-    # Ensure the output directory exists
-    os.makedirs('output', exist_ok=True)
-
-    # Save the figure
-    plt.savefig(f'output/{method}_optical_flow_test{sequence_number}.eps', format='eps')
-    plt.savefig(f'output/{method}_optical_flow_test{sequence_number}.pdf', format='pdf')
-    plt.show()
-
-def adjust_contrast(image):
-        new_image = np.clip((image - image.min()) * (255 / (image.max() - image.min())), 0, 128).astype(np.uint8)
-        return new_image
-
-#Save optical flow visualization for a given method (LIGHTGLUE or ORB).
-def save_optical_flow_visualization_alternative(image0_path, image1_path, keypoints0, keypoints1, all_keypoints1, sequence_number, method='lightglue'):
-
-    # Read and convert images
-    image0_of = cv2.imread(image0_path, cv2.IMREAD_COLOR)
-    image1_of = cv2.imread(image1_path, cv2.IMREAD_COLOR)
-
-    image0_contrast = adjust_contrast(image0_of)
-    image1_contrast = adjust_contrast(image1_of)
+    if isinstance(all_keypoints1, torch.Tensor):
+        all_keypoints1 = all_keypoints1.cpu().numpy() if all_keypoints1.is_cuda else all_keypoints1.numpy()
     
-    image0_rgb = cv2.cvtColor(image0_contrast, cv2.COLOR_BGR2RGB)
-    image1_rgb = cv2.cvtColor(image1_contrast, cv2.COLOR_BGR2RGB)
+    keypoints1_set = set(tuple(kp) for kp in keypoints1)
 
-    # Get image dimensions for adaptive sizing
-    height, width, _ = image1_rgb.shape
-    aspect_ratio = width / height
-    plt.figure(figsize=(aspect_ratio * 6, 6))
-
-    # Display the second image
-    plt.imshow(image1_rgb)
-
-    # Choose colors based on method
-    scatter_color, line_color = ('lime', 'green') if method == 'lightglue' else ('blue', 'purple')
-
-    # Scatter keypoints on the second image
-    #plt.scatter(keypoints1[:, 0], keypoints1[:, 1], color=scatter_color, marker='o', s=4, linewidths=0, alpha=1.0)
-
+    print(len(keypoints1))
+    print(len(all_keypoints1))
+    # Filter all_keypoints1 to get only those not in keypoints1
+    keypoints_not_matched = [kp for kp in all_keypoints1 if tuple(kp) not in keypoints1_set]
+    print(len(keypoints_not_matched))
     # Convert keypoints1 to a list of cv2.KeyPoint objects
-    keypoints1_cv = [cv2.KeyPoint(float(x), float(y), 1) for x, y in all_keypoints1]
+    keypoints_not_matched = [cv2.KeyPoint(float(x), float(y), 1) for x, y in keypoints_not_matched]
 
     # Draw keypoints on the second image
-    image1_with_keypoints = cv2.drawKeypoints(image1_rgb, keypoints1_cv, None, color=(0, 255, 0))
+    image1_with_keypoints = cv2.drawKeypoints(image1_rgb, keypoints_not_matched, None, color=(0, 255, 255))
 
-    # Ensure image is in RGB format for matplotlib
-    #
+    # Choose colors based on method
+    scatter_color, line_color = ('green', 'lime') if method == 'lightglue' else ('green', 'lime')
+
     #  Display the second image with keypoints using matplotlib
     plt.imshow(image1_with_keypoints)
 
-    # Draw lines between corresponding features
-    for (x1, y1), (x2, y2) in zip(keypoints0, keypoints1):
-        plt.plot([x1, x2], [y1, y2], color=line_color, linewidth=2)
+    # Scatter keypoints on the second image,
+    plt.scatter(keypoints1[:, 0], keypoints1[:, 1], color=scatter_color, marker='o', s=4, linewidths=0, alpha=1.0)
 
+    if mask.any() == None:
+        # Draw lines between corresponding features
+        for (x1, y1), (x2, y2) in zip(keypoints0, keypoints1):
+            plt.plot([x1, x2], [y1, y2], color='red', linewidth=1)
+
+    else:
+        # Draw lines between corresponding features with color based on mask
+        for ((x1, y1), (x2, y2)), m in zip(zip(keypoints0, keypoints1), mask):
+            color = 'red' if m == 0 else line_color  # Use red for outliers, else line color
+            plt.plot([x1, x2], [y1, y2], color=color, linewidth=1)
+
+    plt.text(20, 20, f"Optical Flow, method: {method}", fontsize=12, color='white', bbox=dict(facecolor='black', alpha=0.5))
     # Hide axis labels and ticks
     plt.axis('off')
     plt.tight_layout(pad=0.5)
@@ -311,8 +319,9 @@ def save_optical_flow_visualization_alternative(image0_path, image1_path, keypoi
     os.makedirs('output', exist_ok=True)
 
     # Save the figure
-    plt.savefig(f'output/{method}_optical_flow_test_alternativ{sequence_number}.eps', format='eps')
-    plt.savefig(f'output/{method}_optical_flow_test_alternativ{sequence_number}.pdf', format='pdf')
-    plt.show()
+    plt.savefig(f'output/{method}_optical_flow_test{sequence_number}{contrast_suffix}.eps', format='eps')
+    plt.savefig(f'output/{method}_optical_flow_test{sequence_number}{contrast_suffix}.pdf', format='pdf')
 
-    
+    #plt.show()
+
+
