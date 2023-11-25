@@ -1,5 +1,6 @@
 from poseestimationdistance import *
 from lightglue_orb import *
+import os
 
 def get_pose(image0_path, image1_path, K, method):
     if method == "lightglue":
@@ -46,7 +47,6 @@ def runonentireVAROS():
                 [0, fy, cy],
                 [0, 0, 1]])
    
-
     rot_errors_LG = []
     trans_errors_LG = []
     rot_errors_ORB = []
@@ -127,5 +127,11 @@ def runonentireVAROS():
     mean_trans_error_LG = np.mean(trans_errors_LG)
     mean_rot_error_ORB = np.mean(rot_errors_ORB)
     mean_trans_error_ORB = np.mean(trans_errors_ORB)
+
+    # Combine arrays into a 2D array
+    combined_array = np.column_stack((mean_rot_error_LG, mean_trans_error_LG, mean_rot_error_ORB, mean_trans_error_ORB))
+
+    # Specify the file path and write the array to a text file
+    np.savetxt("output/EntireVAROS.txt", combined_array, fmt="%d", delimiter="\t")
 
     return mean_rot_error_LG, mean_trans_error_LG, fails_LG, mean_rot_error_ORB, mean_trans_error_ORB, fails_ORB
