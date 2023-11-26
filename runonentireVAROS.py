@@ -49,6 +49,7 @@ def runonentireVAROS():
    
     rot_errors_LG = []
     trans_errors_LG = []
+    trans_errors_LG = []
     rot_errors_ORB = []
     trans_errors_ORB = []
     fails_LG = 0
@@ -96,40 +97,39 @@ def runonentireVAROS():
             rotation_error_deg, translation_error_deg = calculate_pose_error(T_LG, GT_pose)
             rot_errors_LG.append(rotation_error_deg)
             trans_errors_LG.append(translation_error_deg)
-        else:
+        else: 
+            #saving fails as 360 degrees error for plotting
             fails_LG +=1
+            rot_errors_LG.append(0)
+            trans_errors_LG.append(0)
         #For ORB 
         T_ORB = get_pose(image0_path, image1_path, K, "orb")
         if not np.all(T_ORB == 0):
             rotation_error_deg, translation_error_deg = calculate_pose_error(T_ORB, GT_pose)
             rot_errors_ORB.append(rotation_error_deg)
             trans_errors_ORB.append(translation_error_deg)
-        else:
+        else: 
+            #saving fails as 360 degrees error for plotting
             fails_ORB += 1
+            rot_errors_ORB.append(360)
+            trans_errors_ORB.append(360)
 
-        if counter%100 == 0:
-            mean_rot_error_LG = np.mean(rot_errors_LG)
-            mean_trans_error_LG = np.mean(trans_errors_LG)
-            mean_rot_error_ORB = np.mean(rot_errors_ORB)
-            mean_trans_error_ORB = np.mean(trans_errors_ORB)
-            with open("output/entireVAROS.txt", 'w') as file:
+
+
+    #Removing fails from mean value
+    mean_rot_error_LG = np.mean(rot_errors_LG[rot_errors_LG != 360])
+    mean_trans_error_LG = np.mean(trans_errors_LG[trans_errors_LG != 360])
+    mean_rot_error_ORB = np.mean(rot_errors_ORB[rot_errors_ORB != 360])
+    mean_trans_error_ORB = np.mean(trans_errors_ORB[trans_errors_ORB != 360])
+    with open("output/meanVAROS.txt", 'w') as file:
                 file.write(f"{mean_rot_error_LG}\n")
                 file.write(f"{mean_trans_error_LG}\n")
                 file.write(f"{fails_LG}\n")
                 file.write(f"{mean_rot_error_ORB}\n")
                 file.write(f"{mean_trans_error_ORB}\n")
                 file.write(f"{fails_ORB}\n")
-
-
-
-
-    mean_rot_error_LG = np.mean(rot_errors_LG)
-    mean_trans_error_LG = np.mean(trans_errors_LG)
-    mean_rot_error_ORB = np.mean(rot_errors_ORB)
-    mean_trans_error_ORB = np.mean(trans_errors_ORB)
-
     # Combine arrays into a 2D array
-    combined_array = np.column_stack((mean_rot_error_LG, mean_trans_error_LG, mean_rot_error_ORB, mean_trans_error_ORB))
+    combined_array = np.column_stack((rot_errors_LG, trans_errors_LG, rot_errors_ORB, trans_errors_ORB))
 
     # Specify the file path and write the array to a text file
     np.savetxt("output/EntireVAROS.txt", combined_array, fmt="%d", delimiter="\t")

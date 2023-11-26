@@ -68,6 +68,19 @@ def set_image_paths(sequence):
             #easy test
         13: ["/home/anna/testgithub2/UW-SLAM-preproject/Datasets/VAROS/cam0/data/0277504999936.png",
              "/home/anna/testgithub2/UW-SLAM-preproject/Datasets/VAROS/cam0/data/0277604999936.png"],
+             #wierd results
+        14: ["/home/anna/testgithub2/UW-SLAM-preproject/Datasets/VAROS/cam0/data/0330504999936.png",
+             "/home/anna/testgithub2/UW-SLAM-preproject/Datasets/VAROS/cam0/data/0330604999936.png"],
+        15: ["/home/anna/testgithub2/UW-SLAM-preproject/Datasets/VAROS/cam0/data/0330604999936.png",
+             "/home/anna/testgithub2/UW-SLAM-preproject/Datasets/VAROS/cam0/data/0330704999936.png"],
+        16: ["/home/anna/testgithub2/UW-SLAM-preproject/Datasets/VAROS/cam0/data/0330704999936.png",
+             "/home/anna/testgithub2/UW-SLAM-preproject/Datasets/VAROS/cam0/data/0330804999936.png"],
+        17: ["/home/anna/testgithub2/UW-SLAM-preproject/Datasets/VAROS/cam0/data/0330804999936.png",
+             "/home/anna/testgithub2/UW-SLAM-preproject/Datasets/VAROS/cam0/data/0330904999936.png"],
+        18: ["/home/anna/testgithub2/UW-SLAM-preproject/Datasets/VAROS/cam0/data/0330904999936.png",
+             "/home/anna/testgithub2/UW-SLAM-preproject/Datasets/VAROS/cam0/data/0331004999936.png"],
+        19: ["/home/anna/testgithub2/UW-SLAM-preproject/Datasets/VAROS/cam0/data/0331004999936.png",
+             "/home/anna/testgithub2/UW-SLAM-preproject/Datasets/VAROS/cam0/data/0331104999936.png"],
     }
 
     if sequence not in paths:
