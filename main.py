@@ -5,7 +5,7 @@ from runonentireVAROS import *
 
 """
 #Run LightGlue and ORb+BF on entire VAROS
-"""
+
 mean_rot_error_LG, mean_trans_error_LG, fails_LG, mean_rot_error_ORB, mean_trans_error_ORB, fails_ORB = runonentireVAROS()
 print(mean_rot_error_LG)
 print(mean_trans_error_LG)
@@ -16,7 +16,7 @@ print(fails_ORB)
 
 
 
-
+"""
 timestamps = np.array([
     [165804999936, 165904999936],
     [165904999936, 166004999936],
@@ -32,7 +32,14 @@ timestamps = np.array([
     [446004999936, 446604999936],
     [446004999936, 447204999936],
     #easy example
-    [277504999936, 277604999936]
+    [277504999936, 277604999936],
+    #wierd LG results
+    [330504999936, 330604999936],
+    [330604999936, 330704999936],
+    [330704999936, 330804999936],
+    [330804999936, 330904999936],
+    [330904999936, 331004999936],
+    [331004999936, 331104999936],
 ])
 
 ## FIRST SAVE MATCHED POINTS AS IT IS NEEDED FOR POSE ESTIMATION ##
@@ -88,6 +95,5 @@ for sequence_number in range(1, len(timestamps)+1):
     save_optical_flow_visualization(image1_path, orb_m_kpts0, orb_m_kpts1, orb_kpts1, sequence_number, maskORB, method='orb', adjust_contrast_flag=False)
 
 pose_estimation(timestamps)
-
 
 

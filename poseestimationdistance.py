@@ -153,7 +153,14 @@ def get_paths():
     ["output/test11_matches/test11_lightglue_image1.txt","output/test11_matches/test11_lightglue_image2.txt"],
     ["output/test12_matches/test12_lightglue_image1.txt","output/test12_matches/test12_lightglue_image2.txt"],
     #easy test
-    ["output/test13_lightglue_image1.txt", "output/test13_lightglue_image2.txt"]
+    ["output/test13_lightglue_image1.txt", "output/test13_lightglue_image2.txt"],
+    #wierd results
+    ["output/test14_lightglue_image1.txt", "output/test14_lightglue_image2.txt"],
+    ["output/test15_lightglue_image1.txt", "output/test15_lightglue_image2.txt"],
+    ["output/test16_lightglue_image1.txt", "output/test16_lightglue_image2.txt"],
+    ["output/test17_lightglue_image1.txt", "output/test17_lightglue_image2.txt"],
+    ["output/test18_lightglue_image1.txt", "output/test18_lightglue_image2.txt"],
+    ["output/test19_lightglue_image1.txt", "output/test19_lightglue_image2.txt"]
 ])
     matches_paths_ORB = np.array([
     ["output/test1_matches/test1_orb_image1.txt", "output/test1_matches/test1_orb_image2.txt"],
@@ -170,7 +177,14 @@ def get_paths():
     ["output/test11_matches/test11_orb_image1.txt","output/test11_matches/test11_orb_image2.txt"],
     ["output/test12_matches/test12_orb_image1.txt","output/test12_matches/test12_orb_image2.txt"],
     #easy test
-    ["output/test13_orb_image1.txt", "output/test13_orb_image2.txt"]
+    ["output/test13_orb_image1.txt", "output/test13_orb_image2.txt"],
+    #wierd results
+    ["output/test14_orb_image1.txt", "output/test14_orb_image2.txt"],
+    ["output/test15_orb_image1.txt", "output/test15_orb_image2.txt"],
+    ["output/test16_orb_image1.txt", "output/test16_orb_image2.txt"],
+    ["output/test17_orb_image1.txt", "output/test17_orb_image2.txt"],
+    ["output/test18_orb_image1.txt", "output/test18_orb_image2.txt"],
+    ["output/test19_orb_image1.txt", "output/test19_orb_image2.txt"]
 ])
 
     return matches_paths_LightGlue, matches_paths_ORB
