@@ -1,9 +1,8 @@
 from poseestimationdistance import *
 from lightglue_orb import *
-from findoutliers import *
 from runonentireVAROS import *
 
-"""
+
 #Run LightGlue and ORb+BF on entire VAROS
 
 mean_rot_error_LG, mean_trans_error_LG, fails_LG, mean_rot_error_ORB, mean_trans_error_ORB, fails_ORB = runonentireVAROS()
@@ -97,3 +96,4 @@ for sequence_number in range(1, len(timestamps)+1):
 pose_estimation(timestamps)
 
 
+"""

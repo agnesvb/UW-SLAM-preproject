@@ -49,7 +49,6 @@ def runonentireVAROS():
    
     rot_errors_LG = []
     trans_errors_LG = []
-    trans_errors_LG = []
     rot_errors_ORB = []
     trans_errors_ORB = []
     fails_LG = 0
