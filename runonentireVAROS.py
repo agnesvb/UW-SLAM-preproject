@@ -68,7 +68,6 @@ def runonentireVAROS():
     counter = 0
     for value in array_of_strings[1:]:
         counter += 1 
-
         print("imagenr"+str(counter))
         if value == "0000104999936":
             image0_path = "Datasets/VAROS/cam0/data/0000004999936.png"
@@ -99,8 +98,8 @@ def runonentireVAROS():
         else: 
             #saving fails as 360 degrees error for plotting
             fails_LG +=1
-            rot_errors_LG.append(0)
-            trans_errors_LG.append(0)
+            rot_errors_LG.append(360)
+            trans_errors_LG.append(360)
         #For ORB 
         T_ORB = get_pose(image0_path, image1_path, K, "orb")
         if not np.all(T_ORB == 0):
@@ -114,7 +113,7 @@ def runonentireVAROS():
             trans_errors_ORB.append(360)
 
 
-
+    
     #Removing fails from mean value
     mean_rot_error_LG = np.mean(rot_errors_LG[rot_errors_LG != 360])
     mean_trans_error_LG = np.mean(trans_errors_LG[trans_errors_LG != 360])
