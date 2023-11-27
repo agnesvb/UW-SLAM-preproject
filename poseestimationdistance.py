@@ -76,8 +76,7 @@ def relpose_from_matches(matches1_path, matches2_path, K):
         return None, None
     
     points, R, t, _ = cv2.recoverPose(E,coordinates1, coordinates2) #The number of inliners which pass the cheirality test
-    #R1, t1, R2, t2 = decompose_essential_matrix(E)
-    #return R1, t1, R2, t2
+
 
     T_matrix = np.zeros((4,4))
     T_matrix[:3, :3] = R
@@ -121,7 +120,7 @@ def calculate_pose_error(Matches_pose, GT_pose):
     angular_difference_rad = np.arccos(dot_product)
     # Convert to degrees
     translation_error_deg = np.degrees(angular_difference_rad)
-
+    """
     if t_ab_Matches[2] < 0:
         print("negative z-value detected, turning t")
         t_ab_Matches_turned = - t_ab_Matches
@@ -132,7 +131,7 @@ def calculate_pose_error(Matches_pose, GT_pose):
         angular_difference_rad_turned = np.arccos(dot_product_turned)
         # Convert to degrees
         translation_error_deg = np.degrees(angular_difference_rad_turned)
-
+    """
 
 
     return np.abs(rotation_error_deg), np.abs(translation_error_deg)
@@ -153,7 +152,7 @@ def get_paths():
     ["output/test11_matches/test11_lightglue_image1.txt","output/test11_matches/test11_lightglue_image2.txt"],
     ["output/test12_matches/test12_lightglue_image1.txt","output/test12_matches/test12_lightglue_image2.txt"],
     #easy test
-    ["output/test13_lightglue_image1.txt", "output/test13_lightglue_image2.txt"],
+    ["output/test13_lightglue_image1.txt", "output/test13_lightglue_image2.txt"]
 ])
     matches_paths_ORB = np.array([
     ["output/test1_matches/test1_orb_image1.txt", "output/test1_matches/test1_orb_image2.txt"],
@@ -170,7 +169,7 @@ def get_paths():
     ["output/test11_matches/test11_orb_image1.txt","output/test11_matches/test11_orb_image2.txt"],
     ["output/test12_matches/test12_orb_image1.txt","output/test12_matches/test12_orb_image2.txt"],
     #easy test
-    ["output/test13_orb_image1.txt", "output/test13_orb_image2.txt"],
+    ["output/test13_orb_image1.txt", "output/test13_orb_image2.txt"]
 ])
 
     return matches_paths_LightGlue, matches_paths_ORB
