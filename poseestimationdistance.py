@@ -68,14 +68,19 @@ def relpose_from_matches(matches1_path, matches2_path, K):
     coordinates2 = np.loadtxt(matches2_path)
     if np.shape(coordinates1)[0] < 5:
         print("ERROR: too few matches")
-        return None, None
+        return None, None, None
 
     E, mask = cv2.findEssentialMat(coordinates1, coordinates2, K, method=cv2.RANSAC, prob=0.999, threshold=1)
     if np.shape(E) != (3,3):
         print("number of matches: " + str(np.shape(coordinates1)[0]))
-        return None, None
+        return None, None, None
     
     points, R, t, _ = cv2.recoverPose(E,coordinates1, coordinates2) #The number of inliners which pass the cheirality test
+    R1,R2, _ = cv2.decomposeEssentialMat(E)
+    if np.all(R1 == R):
+        R_alt = R2
+    else:
+        R_alt = R1
 
 
     T_matrix = np.zeros((4,4))
@@ -83,10 +88,10 @@ def relpose_from_matches(matches1_path, matches2_path, K):
     T_matrix[0:3,3] = t.T
     T_matrix[3,3] = 1
 
-    return T_matrix, mask
+    return T_matrix, mask, R_alt
 
 
-def calculate_pose_error(Matches_pose, GT_pose): 
+def calculate_pose_error(Matches_pose, GT_pose, R_alt): 
 
     R_ab_Matches = Matches_pose[:3, :3]
     t_ab_Matches = Matches_pose[:3, 3]
@@ -97,10 +102,18 @@ def calculate_pose_error(Matches_pose, GT_pose):
     axisangle_Matches, _ = cv2.Rodrigues(R_ab_Matches)
     axisangle_GT, _ = cv2.Rodrigues(R_ab_GT)
     #the norm of the rotational vector is the angle of the axis angle representation
-    angle_diff = np.linalg.norm(axisangle_Matches) - np.linalg.norm(axisangle_GT)
+    angle_diff = np.linalg.norm(axisangle_Matches - axisangle_GT)
     # Convert to degrees
     rotation_error_deg = np.degrees(angle_diff)
 
+    if rotation_error_deg > 90:
+        print("rot error larger than 90, switching R")
+        axisangle_Matches_alt, _ = cv2.Rodrigues(R_alt)
+        angle_diff = np.linalg.norm(axisangle_Matches_alt - axisangle_GT)
+        print("old error " + str(rotation_error_deg))
+        # Convert to degrees
+        rotation_error_deg = np.degrees(angle_diff)
+        print("new error " + str(rotation_error_deg))
     # ----ALTERNATIVE----
     #R = R_ab_Matches - R_ab_GT
     #R_angle_diff= np.arccos((np.trace(R)-1)/2)
@@ -132,7 +145,18 @@ def calculate_pose_error(Matches_pose, GT_pose):
         # Convert to degrees
         translation_error_deg = np.degrees(angular_difference_rad_turned)
     """
-
+    if translation_error_deg > 90:
+        print("trans error larger than 90, turning t")
+        t_ab_Matches_turned = - t_ab_Matches
+        #Translational error
+        normalized_t_ab_Matches_turned = t_ab_Matches_turned / np.linalg.norm(t_ab_Matches_turned)
+        #Calculate the angular difference in radians
+        dot_product_turned = np.dot(normalized_t_ab_Matches_turned, normalized_t_ab_GT)
+        angular_difference_rad_turned = np.arccos(dot_product_turned)
+        # Convert to degrees
+        print("old error " + str(translation_error_deg))
+        translation_error_deg = np.degrees(angular_difference_rad_turned)
+        print("new error " + str(translation_error_deg))
 
     return np.abs(rotation_error_deg), np.abs(translation_error_deg)
 
@@ -227,10 +251,10 @@ def pose_estimation(timestamps):
         matches2_path = matches_paths_LightGlue[i,1]
 
 
-        Matches_pose, mask_lg = relpose_from_matches(matches1_path, matches2_path, K)
+        Matches_pose, mask_lg, R_alt = relpose_from_matches(matches1_path, matches2_path, K)
         masksLG.append(mask_lg)
         if Matches_pose is not None:
-            rotation_error_deg, translation_error_deg = calculate_pose_error(Matches_pose, GT_pose)
+            rotation_error_deg, translation_error_deg = calculate_pose_error(Matches_pose, GT_pose, R_alt)
             print("And the pose from the LightGlue matches is:")
             print(Matches_pose)
             print(f"Rotation Error: {rotation_error_deg:.2f} degrees")
@@ -243,10 +267,10 @@ def pose_estimation(timestamps):
         matches1_path = matches_paths_ORB[i,0]
         matches2_path = matches_paths_ORB[i,1]
         
-        Matches_pose, mask_orb = relpose_from_matches(matches1_path, matches2_path, K)
+        Matches_pose, mask_orb, R_alt = relpose_from_matches(matches1_path, matches2_path, K)
         masksORB.append(mask_orb)
         if Matches_pose is not None:
-            rotation_error_deg, translation_error_deg = calculate_pose_error(Matches_pose, GT_pose)
+            rotation_error_deg, translation_error_deg = calculate_pose_error(Matches_pose, GT_pose, R_alt)
             print("And the pose from the ORB-features with brute force matches is:")
             print(Matches_pose)
             print(f"Rotation Error: {rotation_error_deg:.2f} degrees")

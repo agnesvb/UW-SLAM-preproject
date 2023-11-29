@@ -13,7 +13,7 @@ def get_pose(image0_path, image1_path, K, method):
         matches01, kpts0, kpts1, m_kpts0, m_kpts1 = orb_bf(image0, image1)
 
     if np.all(matches01 == False):
-        return 0
+        return 0, 0
     m_kpts0 = np.array(m_kpts0)
     m_kpts1 = np.array(m_kpts1)
     E, mask = cv2.findEssentialMat(m_kpts0, m_kpts1, K,method=cv2.RANSAC, prob=0.999, threshold=1 )
@@ -21,16 +21,21 @@ def get_pose(image0_path, image1_path, K, method):
     if np.shape(E) != (3,3):
         #Means we cannot recover pose
         print("number of matches: " + str(np.shape(m_kpts0)[0]))
-        return 0
+        return 0, 0
     
     points, R, t, mask = cv2.recoverPose(E,m_kpts0, m_kpts1) #The number of inliners which pass the cheirality test
+    R1,R2, _ = cv2.decomposeEssentialMat(E)
+    if np.all(R1 == R):
+        R_alt = R2
+    else:
+        R_alt = R1
 
     T_matrix = np.zeros((4,4))
     T_matrix[:3, :3] = R
     T_matrix[0:3,3] = t.T
     T_matrix[3,3] = 1
 
-    return T_matrix
+    return T_matrix, R_alt
 
     
 
@@ -90,9 +95,9 @@ def runonentireVAROS():
 
 
         #For LightGlue
-        T_LG = get_pose(image0_path, image1_path, K, "lightglue")
+        T_LG, R_alt = get_pose(image0_path, image1_path, K, "lightglue")
         if not np.all(T_LG == 0):
-            rotation_error_deg, translation_error_deg = calculate_pose_error(T_LG, GT_pose)
+            rotation_error_deg, translation_error_deg = calculate_pose_error(T_LG, GT_pose, R_alt)
             rot_errors_LG.append(rotation_error_deg)
             trans_errors_LG.append(translation_error_deg)
         else: 
@@ -101,9 +106,9 @@ def runonentireVAROS():
             rot_errors_LG.append(360)
             trans_errors_LG.append(360)
         #For ORB 
-        T_ORB = get_pose(image0_path, image1_path, K, "orb")
+        T_ORB, R_alt = get_pose(image0_path, image1_path, K, "orb")
         if not np.all(T_ORB == 0):
-            rotation_error_deg, translation_error_deg = calculate_pose_error(T_ORB, GT_pose)
+            rotation_error_deg, translation_error_deg = calculate_pose_error(T_ORB, GT_pose, R_alt)
             rot_errors_ORB.append(rotation_error_deg)
             trans_errors_ORB.append(translation_error_deg)
         else: 

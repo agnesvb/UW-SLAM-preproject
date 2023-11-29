@@ -1,5 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.ticker import MaxNLocator
+
 
 # Read the data from the text file
 file_path = 'output/EntireVAROS.txt'
@@ -24,13 +26,21 @@ axs[3].plot(array4, label='ORB+BF Translation')
 for ax in axs:
     ax.set_ylim([0, 365])
 
+
+
+# Format Y-axis labels as degrees
+for ax in axs:
+    ax.yaxis.set_major_locator(MaxNLocator(integer=True))  # Set y-axis to integer values
+    ax.set_yticklabels([f'{int(y)}°' for y in ax.get_yticks()])
+
+
 # Add labels and legend
 axs[0].set_ylabel('Angular Error')
 axs[1].set_ylabel('Angular Error')
 axs[2].set_ylabel('Angular Error')
 axs[3].set_ylabel('Angular Error')
 
-axs[3].set_xlabel('Frame')
+axs[3].set_xlabel('Timestamp')
 
 for ax in axs:
     ax.legend()
