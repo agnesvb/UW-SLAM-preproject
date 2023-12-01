@@ -3,17 +3,37 @@ import cv2
 import matplotlib.pyplot as plt
 
 file_path = "Datasets/VAROS/camM0_poses_transformation_matrix.csv"
+timestamp_path = "Datasets/VAROS/Timestamp_full.txt"
+with open(timestamp_path, "r") as file:
+    # Read lines from the file and store them as an array of strings
+    lines = file.readlines()
+
+    # Remove leading and trailing whitespaces from each string
+    array_of_strings = [line.strip() for line in lines]
+    picture_stamps  = array_of_strings[1:]
+    for i in range(len(picture_stamps)):
+        picture_stamps[i] = int(picture_stamps[i])
+print(picture_stamps)
 data = {}
 R = {}
 t = {}
 baselines = []
+counter = 0
 T_matrix = np.zeros((4,4))
 with open(file_path, 'r') as file:
     for line in file:
         if not line.startswith("#"):  # Skip comments
-            pastT = T_matrix
             row = line.strip().split(",")
             timestamp = int(float(row[0]))
+            #skip if the timestamp is not a picture
+            if not timestamp in picture_stamps:
+                continue
+            counter += 1
+            #if (counter-1)%8 != 0:
+            #    continue
+            print(counter)
+            pastT = T_matrix
+            
             R_matrix = np.zeros((3,3))
             t_vec = np.zeros(3)
             T_matrix = np.zeros((4,4))
@@ -42,6 +62,7 @@ with open(file_path, 'r') as file:
                 T1inv= np.linalg.inv(T1)
                 Trel = np.dot(T1inv,T2)
                 baselines.append(np.linalg.norm(Trel[:3, 3]))
+                print(np.linalg.norm(Trel[:3, 3]))
 
-
+np.savetxt("output/baselines.txt", baselines, fmt="%.10f", delimiter="\t")
 print("the mean of the baseline is " + str(np.mean(baselines)) )

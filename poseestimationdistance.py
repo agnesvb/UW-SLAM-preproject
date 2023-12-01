@@ -34,22 +34,19 @@ def read_GT_from_file(file_path):
                 t[timestamp] = t_vec
     return data
 
-def relposeALT(data, R, t, t_start, t_end):
+def relposeALT(data, t_start, t_end):
     T1 = data[t_start]
     T2 = data[t_end]
-    R1 = R[t_start]
-    R2 = R[t_end]
-    t1 = t[t_start]
-    t2 = t[t_end]
-    T1inv= np.linalg.inv(T1)
-    Trel = np.dot(T1inv,T2)
+    R1 = T1[:3, :3] 
+    R2 = T2[:3, :3] 
+    t1 = T1[0:3,3].T
+    t2 = T2[0:3,3].T
     R1inv = np.transpose(R1)
     t1inv = np.dot(-R1inv,t1)
     Trel_alt = np.zeros((4,4))
     Trel_alt[:3, :3] = np.dot(R1inv,R2)
     Trel_alt[0:3,3] = np.dot(R1inv, t2) + t1inv
     Trel_alt[3,3] = 1
-
 
     return Trel_alt
 
@@ -106,14 +103,14 @@ def calculate_pose_error(Matches_pose, GT_pose, R_alt):
     # Convert to degrees
     rotation_error_deg = np.degrees(angle_diff)
 
-    if rotation_error_deg > 90:
-        print("rot error larger than 90, switching R")
-        axisangle_Matches_alt, _ = cv2.Rodrigues(R_alt)
-        angle_diff = np.linalg.norm(axisangle_Matches_alt - axisangle_GT)
-        print("old error " + str(rotation_error_deg))
-        # Convert to degrees
-        rotation_error_deg = np.degrees(angle_diff)
-        print("new error " + str(rotation_error_deg))
+    # Check if the other R gives better result
+    axisangle_Matches_alt, _ = cv2.Rodrigues(R_alt)
+    angle_diff = np.linalg.norm(axisangle_Matches_alt - axisangle_GT)
+    # Convert to degrees
+    rotation_error_deg_alt = np.degrees(angle_diff)
+    #Use the rotation with least error
+    if rotation_error_deg_alt < rotation_error_deg:
+        rotation_error_deg = rotation_error_deg_alt
     # ----ALTERNATIVE----
     #R = R_ab_Matches - R_ab_GT
     #R_angle_diff= np.arccos((np.trace(R)-1)/2)
@@ -134,6 +131,7 @@ def calculate_pose_error(Matches_pose, GT_pose, R_alt):
     # Convert to degrees
     translation_error_deg = np.degrees(angular_difference_rad)
     """
+    #Check if z is negative, then turn
     if t_ab_Matches[2] < 0:
         print("negative z-value detected, turning t")
         t_ab_Matches_turned = - t_ab_Matches
@@ -145,7 +143,9 @@ def calculate_pose_error(Matches_pose, GT_pose, R_alt):
         # Convert to degrees
         translation_error_deg = np.degrees(angular_difference_rad_turned)
     """
+    
     if translation_error_deg > 90:
+    #check if t is larger than 90, then turn
         print("trans error larger than 90, turning t")
         t_ab_Matches_turned = - t_ab_Matches
         #Translational error
@@ -157,8 +157,9 @@ def calculate_pose_error(Matches_pose, GT_pose, R_alt):
         print("old error " + str(translation_error_deg))
         translation_error_deg = np.degrees(angular_difference_rad_turned)
         print("new error " + str(translation_error_deg))
-
+    
     return np.abs(rotation_error_deg), np.abs(translation_error_deg)
+    
 
 def get_paths():
     matches_paths_LightGlue = np.array([
